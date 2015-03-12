@@ -6,6 +6,7 @@ from contextlib import closing
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 from pyramid.view import view_config
+from pyramid.events import NewRequest, subscriber
 from waitress import serve
 
 TABLE1_SCHEMA = """
@@ -43,6 +44,31 @@ def init_db():
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
         db.commit()
+
+
+@subscriber(NewRequest)
+def open_connection(event):
+    # The event object has access to to the newly created request, your app,
+    # settings, etc.
+    request = event.request
+    settings = request.registry.settings
+    # Now we hang our database connection on the request object
+    request.db = connect_db(settings)
+    request.add_finished_callback(close_connection)
+
+
+def close_connection(request):
+    """close the database connection for this request
+
+    If there has been an error in the processing of the request, abort any open transactions.
+    """
+    db = getattr(request, 'db', None)
+    if db is not None:
+        if request.exception is not None:
+            db.rollback()
+        else:
+            db.commit()
+        request.db.close()
 
 
 def main():
