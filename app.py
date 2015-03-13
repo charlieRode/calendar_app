@@ -22,8 +22,20 @@ CREATE TABLE IF NOT EXISTS events (
     time TIME NOT NULL)
 """
 
+ADD_EVENT = """
+INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
+"""
+
 logging.basicConfig()
 log = logging.getLogger(__file__)
+
+
+def add_event(request):
+    """adds an event to the calendar"""
+    event = request.params['description']
+    date = request.params['date']
+    time = request.params['time']
+    request.db.cursor().execute(ADD_EVENT, [event, date, time])
 
 
 @view_config(route_name='home', renderer='string')
@@ -60,7 +72,8 @@ def open_connection(event):
 def close_connection(request):
     """close the database connection for this request
 
-    If there has been an error in the processing of the request, abort any open transactions.
+    If there has been an error in the processing of the request, abort any open
+    transactions.
     """
     db = getattr(request, 'db', None)
     if db is not None:
