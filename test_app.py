@@ -98,6 +98,16 @@ def mock_request(db, request):  # <- registered fixtures as arguments
 # Use yield fixutes when you want to maintain the program state created by your
 # fixture
 
+def test_read_day_empty(mock_request):
+    from app import read_day
+    today = str(datetime.datetime.today()).split(' ')[0]
+    # Because our read_day function will depend upon a given date
+    # we need to hang a date on our mock_request.
+    mock_request.params['date'] = today
+    result = read_day(mock_request)
+    assert type(result) == dict
+    assert len(result) == 0
+
 
 def test_add_event(mock_request):
     from app import add_event
@@ -124,21 +134,17 @@ def test_add_event(mock_request):
         assert val == actual[idx]
 
 
-def test_read_day_empty(mock_request):
-    from app import read_day
-    result = read_day(mock_request)
-    assert type(result) == dict
-    assert len(result) == 0
-
-
 def test_read_day(mock_request):
     from app import read_day
     today = str(datetime.datetime.today()).split(' ')[0]
+    # As above, we need to supply our test request-object with
+    # information about a date, so that read_day can query the DB.
+    mock_request.params['date'] = today
     event1 = ('Church', today, '8:00')
     event2 = ('Dinner', today, '17:00')
     run_query(mock_request.db, ADD_EVENT, event1, False)
     run_query(mock_request.db, ADD_EVENT, event2, False)
     result = read_day(mock_request)
     assert len(result) == 2
-    assert result['8:00:00'] == 'Church'
+    assert result['08:00:00'] == 'Church'
     assert result['17:00:00'] == 'Dinner'

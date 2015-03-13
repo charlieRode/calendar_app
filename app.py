@@ -26,8 +26,24 @@ ADD_EVENT = """
 INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
 """
 
+RETRIEVE_DAY = """
+SELECT time, description from events WHERE date=%s;
+"""
+
 logging.basicConfig()
 log = logging.getLogger(__file__)
+
+
+def read_day(request):
+    date = request.params['date']
+    cur = request.db.cursor()
+    cur.execute(RETRIEVE_DAY, [date])
+    query_result = cur.fetchall()
+    result = []
+    # Convert all elements in the returned list of tuples to strings
+    for tup in query_result:
+        result.append( (str(tup[0]), str(tup[1])) )
+    return dict(result)
 
 
 def add_event(request):
