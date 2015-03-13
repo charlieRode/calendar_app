@@ -2,7 +2,7 @@ from contextlib import closing
 from pyramid import testing
 import pytest
 import datetime
-from app import connect_db, TABLE1_SCHEMA, TABLE2_SCHEMA
+from app import connect_db, TABLE1_SCHEMA, TABLE2_SCHEMA, ADD_EVENT
 
 TEST_DSN = 'dbname=test_calendar_db user=store'
 
@@ -122,3 +122,23 @@ def test_add_event(mock_request):
     expected = (expected[0], expected[1], '17:00:00')
     for idx, val in enumerate(expected):
         assert val == actual[idx]
+
+
+def test_read_day_empty(mock_request):
+    from app import read_day
+    result = read_day(mock_request)
+    assert type(result) == dict
+    assert len(result) == 0
+
+
+def test_read_day(mock_request):
+    from app import read_day
+    today = str(datetime.datetime.today()).split(' ')[0]
+    event1 = ('Church', today, '8:00')
+    event2 = ('Dinner', today, '17:00')
+    run_query(mock_request.db, ADD_EVENT, event1, False)
+    run_query(mock_request.db, ADD_EVENT, event2, False)
+    result = read_day(mock_request)
+    assert len(result) == 2
+    assert result['8:00:00'] == 'Church'
+    assert result['17:00:00'] == 'Dinner'
