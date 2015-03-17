@@ -2,6 +2,7 @@
 import os
 import logging
 import psycopg2
+import datetime
 from contextlib import closing
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
@@ -34,13 +35,10 @@ logging.basicConfig()
 log = logging.getLogger(__file__)
 
 
-@view_config(route_name='home', renderer='string')
-def home(request):
-    return "Hello World!!"
-
-#@view_config(route_name='home', renderer='templates/day.jinja2')
+@view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
-    date = request.params['date']
+    #date = request.params['date']
+    date = datetime.datetime.today()
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
