@@ -34,6 +34,11 @@ logging.basicConfig()
 log = logging.getLogger(__file__)
 
 
+@view_config(route_name='home', renderer='string')
+def home(request):
+    return "Hello World!!"
+
+#@view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
     date = request.params['date']
     cur = request.db.cursor()
@@ -52,11 +57,6 @@ def add_event(request):
     date = request.params['date']
     time = request.params['time']
     request.db.cursor().execute(ADD_EVENT, [event, date, time])
-
-
-@view_config(route_name='home', renderer='string')
-def home(request):
-    return "Hello World!!"
 
 
 def connect_db(settings):
