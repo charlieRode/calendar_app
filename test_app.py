@@ -2,6 +2,7 @@ from contextlib import closing
 from pyramid import testing
 import pytest
 import datetime
+import os
 from app import connect_db, TABLE1_SCHEMA, TABLE2_SCHEMA, ADD_EVENT
 
 TEST_DSN = 'dbname=test_calendar_db user=store'
@@ -21,7 +22,6 @@ def init_db(settings):
         db.commit()
 
     def populate_calendar(settings):
-        """Thank you to Gringo Suave @StackOverflow!"""
         INSERT_DAY = """
         INSERT INTO days (date, dow) VALUES (%s, %s)
         """
@@ -61,6 +61,15 @@ def run_query(db, query, params=(), get_results=True):
     if get_results:
         results = cursor.fetchall()
     return results
+
+
+@pytest.fixture(scope='function')
+def app(db):
+    from app import main
+    from webtest import TestApp
+    os.environ['DATABASE_URL'] = TEST_DSN
+    app = main()
+    return TestApp(app)
 
 
 @pytest.fixture(scope='session')
@@ -106,7 +115,7 @@ def test_read_day_empty(mock_request):
     mock_request.params['date'] = today
     result = read_day(mock_request)
     assert type(result) == dict
-    assert len(result) == 0
+    assert len(result['events']) == 0
 
 
 def test_add_event(mock_request):
@@ -145,6 +154,43 @@ def test_read_day(mock_request):
     run_query(mock_request.db, ADD_EVENT, event1, False)
     run_query(mock_request.db, ADD_EVENT, event2, False)
     result = read_day(mock_request)
-    assert len(result) == 2
-    assert result['08:00:00'] == 'Church'
-    assert result['17:00:00'] == 'Dinner'
+    assert len(result['events']) == 2
+    assert result['events']['8:00 AM'] == 'Church'
+    assert result['events']['5:00 PM'] == 'Dinner'
+
+
+def test_empty_listing(app):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    expected = 'No events today!'
+    assert expected in actual
+
+
+@pytest.fixture(scope='function')
+def entry(db, request):
+    """provide a single event entry to the database"""
+    INSERT_EVENT = """
+    INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
+    """
+    settings = db
+    expected = ('Dinner', '2015-03-20', '17:00:00')
+    with closing(connect_db(settings)) as db:
+        run_query(db, INSERT_EVENT, expected, False)
+        db.commit()
+
+    def cleanup():
+        clear_events(settings)
+
+    request.addfinalizer(cleanup)
+
+    return expected
+
+
+def test_listing(app, entry):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    expected = ('Dinner', '5:00 PM')
+    for item in expected:
+        assert item in actual
