@@ -115,7 +115,7 @@ def test_read_day_empty(mock_request):
     mock_request.params['date'] = today
     result = read_day(mock_request)
     assert type(result) == dict
-    assert len(result) == 0
+    assert len(result['events']) == 0
 
 
 def test_add_event(mock_request):
@@ -154,9 +154,9 @@ def test_read_day(mock_request):
     run_query(mock_request.db, ADD_EVENT, event1, False)
     run_query(mock_request.db, ADD_EVENT, event2, False)
     result = read_day(mock_request)
-    assert len(result) == 2
-    assert result['08:00:00'] == 'Church'
-    assert result['17:00:00'] == 'Dinner'
+    assert len(result['events']) == 2
+    assert result['events']['8:00 AM'] == 'Church'
+    assert result['events']['5:00 PM'] == 'Dinner'
 
 
 def test_empty_listing(app):
@@ -180,7 +180,7 @@ def entry(db, request):
         db.commit()
 
     def cleanup():
-        clear_entries(settings)
+        clear_events(settings)
 
     request.addfinalizer(cleanup)
 
@@ -191,5 +191,6 @@ def test_listing(app, entry):
     response = app.get('/')
     assert response.status_code == 200
     actual = response.body
-    for expected in entry[:2]:
-        assert expected in actual
+    expected = ('Dinner', '5:00 PM')
+    for item in expected:
+        assert item in actual
