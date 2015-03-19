@@ -38,16 +38,18 @@ log = logging.getLogger(__file__)
 @view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
     #date = request.params['date']
-    date = datetime.datetime.today()
+    date = '2015-03-18'
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
     result = []
     # Convert all elements in the returned list of tuples to strings
     for tup in query_result:
-        result.append( (str(tup[0]), str(tup[1])) )
-    return dict(result)
-
+        result.append( (tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) )
+    # Our view function needs to return the packaged information we've requested in a format
+    # that our jinja2 template can render. This format is a dictionary, whose keys are strings
+    # that are referenced in the template.
+    return {'events': dict(result)}
 
 def add_event(request):
     """adds an event to the calendar"""
@@ -70,6 +72,21 @@ def init_db():
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
         db.commit()
+
+    def populate_calendar():
+        INSERT_DAY = """
+        INSERT INTO days (date, dow) VALUES (%s, %s)
+        """
+        date = datetime.datetime.today()
+        dow = (date.weekday() + 1) % 7  # <- Sunday: 0, Monday : 1, ..., Saturday: 6
+        with closing(connect_db(settings)) as db:
+            for i in xrange(365):
+                db.cursor().execute(INSERT_DAY, [str(date).split(" ")[0], dow])
+                date += datetime.timedelta(1)
+                dow = (date.weekday() + 1) % 7
+            db.commit()
+
+    populate_calendar()
 
 
 @subscriber(NewRequest)
