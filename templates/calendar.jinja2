@@ -3,7 +3,7 @@
 {% for month in calendar %}
     <h2>{{ month }}</h2>
     <ul>
-        {% for day in month %}
+        {% for day in calendar[month] %}
         <li>{{ day }}</li>
         {% endfor %}
     </ul>
