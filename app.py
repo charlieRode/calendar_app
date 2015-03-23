@@ -38,21 +38,42 @@ log = logging.getLogger(__file__)
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
-    # I need to figure out where to grab the date parameter. Do I hang it on the request's
-    # params attribute? Do I pass it in as a variable?
-    #date = request.params['date']
-    date = str(datetime.datetime.today()).split(' ')[0]
+    # We want the main view page to always display today's events
+    # This will be for viewing only.
+    today = str(datetime.datetime.today()).split(' ')[0]
     cur = request.db.cursor()
-    cur.execute(RETRIEVE_DAY, [date])
+    cur.execute(RETRIEVE_DAY, [today])
     query_result = cur.fetchall()
     result = []
     # Convert all elements in the returned list of tuples to strings
     for tup in query_result:
         result.append( (tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) )
+
+        def convert_to_readable_format(date):
+            """converts a date's format from YYYY-MM-DD to <Month> <Day>, <Year>"""
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+            year = date.split('-')[0]
+            month_int = int(date.split('-')[1].lstrip('0'))
+            month = months[month_int - 1]
+            day = date.split('-')[2].lstrip('0')
+            if day[-1] == '1':
+                day += 'st'
+            elif day[-1] == '2':
+                day += 'nd'
+            elif day[-1] == '3':
+                day += 'rd'
+            else:
+                day += 'th'
+            return '{m} {d}, {y}'.format(y=year, m=month, d=day)
+
+    today = convert_to_readable_format(today)
+
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render. This format is a dictionary, whose keys are strings
     # that are referenced in the template.
-    return {'events': dict(result)}
+
+    return {'today': today, 'events': dict(result)}
 
 def add_event(request):
     """adds an event to the calendar"""

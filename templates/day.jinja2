@@ -1,6 +1,6 @@
 {% extends "base.jinja2" %}
 {% block body %}
-    <h2>The Day (Add day context after successful implementation of event context...)</h2>
+    <h2>{{ today }}</h2>
     {% for event in events %}
     <article class="event" id="event={{event.id}}">
         <h3>{{ event }}: {{ events[event] }}</h3>
