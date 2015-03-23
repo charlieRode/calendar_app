@@ -32,8 +32,34 @@ RETRIEVE_DAY = """
 SELECT time, description from events WHERE date=%s;
 """
 
+
 logging.basicConfig()
 log = logging.getLogger(__file__)
+
+
+@view_config(route_name='calendar', renderer='templates/calendar.jinja2')
+def read_calendar(request):
+    cur = request.db.cursor()
+    cur.execute("SELECT date FROM days")
+    query_result = cur.fetchall()
+    results = [result[0] for result in query_result]
+    jan = [str(date).split(' ')[0] for date in results if date.month==1]
+    feb = [str(date).split(' ')[0] for date in results if date.month==2]
+    march = [str(date).split(' ')[0] for date in results if date.month==3]
+    april = [str(date).split(' ')[0] for date in results if date.month==4]
+    may = [str(date).split(' ')[0] for date in results if date.month==5]
+    june = [str(date).split(' ')[0] for date in results if date.month==6]
+    july = [str(date).split(' ')[0] for date in results if date.month==7]
+    aug = [str(date).split(' ')[0] for date in results if date.month==8]
+    sept = [str(date).split(' ')[0] for date in results if date.month==9]
+    octb = [str(date).split(' ')[0] for date in results if date.month==10]
+    nov = [str(date).split(' ')[0] for date in results if date.month==11]
+    dec = [str(date).split(' ')[0] for date in results if date.month==12]
+    calendar = {'January': jan, 'February': feb, 'March': march, 'April': april, 'May': may,
+    'June': june, 'July': july, 'August': aug, 'September': sept, 'October': octb,
+    'November': nov, 'December': dec}
+    return {'calendar': calendar}
+
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
@@ -67,13 +93,11 @@ def read_day(request):
                 day += 'th'
             return '{m} {d}, {y}'.format(y=year, m=month, d=day)
 
-    today = convert_to_readable_format(today)
-
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render. This format is a dictionary, whose keys are strings
     # that are referenced in the template.
 
-    return {'today': today, 'events': dict(result)}
+    return {'today': convert_to_readable_format(today), 'events': dict(result)}
 
 def add_event(request):
     """adds an event to the calendar"""
@@ -169,6 +193,7 @@ def main():
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('calendar', '/calendar')
     config.scan()
     app = config.make_wsgi_app()
     return app

@@ -159,6 +159,13 @@ def test_read_day(mock_request):
     assert result['events']['5:00 PM'] == 'Dinner'
 
 
+def test_read_calendar(mock_request):
+    from app import read_calendar
+    today = str(datetime.datetime.today()).split(' ')[0]
+    result = read_calendar(mock_request)
+    assert today in result['calendar']['March']
+
+
 def test_empty_listing(app):
     response = app.get('/')
     assert response.status_code == 200
@@ -195,6 +202,14 @@ def test_listing(app, entry):
     expected = ('Dinner', '5:00 PM')
     for item in expected:
         assert item in actual
+
+
+def test_calendar_view(app):
+    response = app.get('/calendar')
+    assert response.status_code == 200
+    actual = response.body
+    expected = str(datetime.datetime.today()).split(' ')[0]
+    assert expected in actual
 
 
 def test_post_to_add_view(app):
