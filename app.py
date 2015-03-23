@@ -8,6 +8,7 @@ from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 from pyramid.view import view_config
 from pyramid.events import NewRequest, subscriber
+from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from waitress import serve
 
 TABLE1_SCHEMA = """
@@ -37,8 +38,10 @@ log = logging.getLogger(__file__)
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
+    # I need to figure out where to grab the date parameter. Do I hang it on the request's
+    # params attribute? Do I pass it in as a variable?
     #date = request.params['date']
-    date = '2015-03-18'
+    date = str(datetime.datetime.today()).split(' ')[0]
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
@@ -57,6 +60,17 @@ def add_event(request):
     date = request.params['date']
     time = request.params['time']
     request.db.cursor().execute(ADD_EVENT, [event, date, time])
+
+
+@view_config(route_name='add', request_method='POST')
+def add_event_view(request):
+    """view function to add an event to the calendar"""
+    try:
+        add_event(request)
+    except psycopg2.Error:
+        return HTTPInternalServerError
+    return HTTPFound(request.route_url('home'))
+
 
 
 def connect_db(settings):
@@ -133,6 +147,7 @@ def main():
     )
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
+    config.add_route('add', '/add')
     config.scan()
     app = config.make_wsgi_app()
     return app
