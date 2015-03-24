@@ -32,7 +32,6 @@ RETRIEVE_DAY = """
 SELECT time, description from events WHERE date=%s;
 """
 
-
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -40,33 +39,67 @@ log = logging.getLogger(__file__)
 @view_config(route_name='calendar', renderer='templates/calendar.jinja2')
 def read_calendar(request):
 
+    class Month(object):
+        def __init__(self, name, num):
+            self.name = name
+            self.num = num
+
+
+    January = Month("January", 1)
+    February = Month("February", 2)
+    March = Month("March", 3)
+    April = Month("April", 4)
+    May = Month("May", 5)
+    June = Month("June", 6)
+    July = Month("July", 7)
+    August = Month("August", 8)
+    September = Month("September", 9)
+    October = Month("October", 10)
+    November = Month("November", 11)
+    December = Month("December", 12)
+
+    calendar = [January, February, March, April, May, June, July, August, September, October, November, December]
+    return {'calendar': calendar}
 
 
 @view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
 def read_calendar_month(request):
+    month = int(request.params['month'])
     cur = request.db.cursor()
     cur.execute("SELECT date FROM days")
     query_result = cur.fetchall()
     results = [result[0] for result in query_result]
-    jan = [str(date).split(' ')[0] for date in results if date.month==1]
-    feb = [str(date).split(' ')[0] for date in results if date.month==2]
-    march = [str(date).split(' ')[0] for date in results if date.month==3]
-    april = [str(date).split(' ')[0] for date in results if date.month==4]
-    may = [str(date).split(' ')[0] for date in results if date.month==5]
-    june = [str(date).split(' ')[0] for date in results if date.month==6]
-    july = [str(date).split(' ')[0] for date in results if date.month==7]
-    aug = [str(date).split(' ')[0] for date in results if date.month==8]
-    sept = [str(date).split(' ')[0] for date in results if date.month==9]
-    octb = [str(date).split(' ')[0] for date in results if date.month==10]
-    nov = [str(date).split(' ')[0] for date in results if date.month==11]
-    dec = [str(date).split(' ')[0] for date in results if date.month==12]
-    calendar = {'January': jan, 'February': feb, 'March': march, 'April': april, 'May': may,
-    'June': june, 'July': july, 'August': aug, 'September': sept, 'October': octb,
-    'November': nov, 'December': dec}
+    days_of_month = [str(date).split(' ')[0] for date in results if date.month==month]
+    return {'dates': days_of_month}
+
+
+
+
+#@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
+#def read_calendar_month(request):
+#    cur = request.db.cursor()
+#    cur.execute("SELECT date FROM days")
+#    query_result = cur.fetchall()
+#    results = [result[0] for result in query_result]
+#    jan = [str(date).split(' ')[0] for date in results if date.month==1]
+#    feb = [str(date).split(' ')[0] for date in results if date.month==2]
+#    march = [str(date).split(' ')[0] for date in results if date.month==3]
+#    april = [str(date).split(' ')[0] for date in results if date.month==4]
+#    may = [str(date).split(' ')[0] for date in results if date.month==5]
+#    june = [str(date).split(' ')[0] for date in results if date.month==6]
+#    july = [str(date).split(' ')[0] for date in results if date.month==7]
+#    aug = [str(date).split(' ')[0] for date in results if date.month==8]
+#    sept = [str(date).split(' ')[0] for date in results if date.month==9]
+#    octb = [str(date).split(' ')[0] for date in results if date.month==10]
+#    nov = [str(date).split(' ')[0] for date in results if date.month==11]
+#    dec = [str(date).split(' ')[0] for date in results if date.month==12]
+#    calendar = {'January': jan, 'February': feb, 'March': march, 'April': april, 'May': may,
+#    'June': june, 'July': july, 'August': aug, 'September': sept, 'October': octb,
+#    'November': nov, 'December': dec}
     # Since calendar is a dictionary, the months will not be displayed in order.
     # As of now, I'm not sure what the best approach to fix this is.
     # Will come back to it later.
-    return {'calendar': calendar}
+#    return {'calendar': calendar}
 
 
 

@@ -1,11 +1,14 @@
 {% extends "base.jinja2" %}
 {% block body %}
-{% for month in calendar %}
-    <h2>{{ month }}</h2>
+<form action="{{ request.route_url('calendar_month') }}" method="GET">
     <ul>
-        {% for day in calendar[month] %}
-        <li>{{ day }}</li>
+        {% for month in calendar %}
+        <li>
+            <label for="{{ month }}">{{ month.name }}</label>
+            <input type="radio" id="{{ month }}" name="month" value="{{ month.num }}"/>
+        </li>
         {% endfor %}
     </ul>
-{% endfor %}
+    <button type="submit">Submit **Rid this with JQuery!**</button>
+</form>
 {% endblock %}
