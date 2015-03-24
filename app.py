@@ -39,6 +39,11 @@ log = logging.getLogger(__file__)
 
 @view_config(route_name='calendar', renderer='templates/calendar.jinja2')
 def read_calendar(request):
+
+
+
+@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
+def read_calendar_month(request):
     cur = request.db.cursor()
     cur.execute("SELECT date FROM days")
     query_result = cur.fetchall()
@@ -58,6 +63,9 @@ def read_calendar(request):
     calendar = {'January': jan, 'February': feb, 'March': march, 'April': april, 'May': may,
     'June': june, 'July': july, 'August': aug, 'September': sept, 'October': octb,
     'November': nov, 'December': dec}
+    # Since calendar is a dictionary, the months will not be displayed in order.
+    # As of now, I'm not sure what the best approach to fix this is.
+    # Will come back to it later.
     return {'calendar': calendar}
 
 
@@ -194,6 +202,7 @@ def main():
     config.add_route('home', '/')
     config.add_route('add', '/add')
     config.add_route('calendar', '/calendar')
+    config.add_route('calendar_month', '/calendar_month')
     config.scan()
     app = config.make_wsgi_app()
     return app
