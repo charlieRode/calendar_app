@@ -8,6 +8,7 @@ from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 from pyramid.view import view_config
 from pyramid.events import NewRequest, subscriber
+from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from waitress import serve
 
 TABLE1_SCHEMA = """
@@ -31,25 +32,80 @@ RETRIEVE_DAY = """
 SELECT time, description from events WHERE date=%s;
 """
 
+
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
 
+@view_config(route_name='calendar', renderer='templates/calendar.jinja2')
+def read_calendar(request):
+
+
+
+@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
+def read_calendar_month(request):
+    cur = request.db.cursor()
+    cur.execute("SELECT date FROM days")
+    query_result = cur.fetchall()
+    results = [result[0] for result in query_result]
+    jan = [str(date).split(' ')[0] for date in results if date.month==1]
+    feb = [str(date).split(' ')[0] for date in results if date.month==2]
+    march = [str(date).split(' ')[0] for date in results if date.month==3]
+    april = [str(date).split(' ')[0] for date in results if date.month==4]
+    may = [str(date).split(' ')[0] for date in results if date.month==5]
+    june = [str(date).split(' ')[0] for date in results if date.month==6]
+    july = [str(date).split(' ')[0] for date in results if date.month==7]
+    aug = [str(date).split(' ')[0] for date in results if date.month==8]
+    sept = [str(date).split(' ')[0] for date in results if date.month==9]
+    octb = [str(date).split(' ')[0] for date in results if date.month==10]
+    nov = [str(date).split(' ')[0] for date in results if date.month==11]
+    dec = [str(date).split(' ')[0] for date in results if date.month==12]
+    calendar = {'January': jan, 'February': feb, 'March': march, 'April': april, 'May': may,
+    'June': june, 'July': july, 'August': aug, 'September': sept, 'October': octb,
+    'November': nov, 'December': dec}
+    # Since calendar is a dictionary, the months will not be displayed in order.
+    # As of now, I'm not sure what the best approach to fix this is.
+    # Will come back to it later.
+    return {'calendar': calendar}
+
+
+
 @view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
-    #date = request.params['date']
-    date = '2015-03-18'
+    # We want the main view page to always display today's events
+    # This will be for viewing only.
+    today = str(datetime.datetime.today()).split(' ')[0]
     cur = request.db.cursor()
-    cur.execute(RETRIEVE_DAY, [date])
+    cur.execute(RETRIEVE_DAY, [today])
     query_result = cur.fetchall()
     result = []
     # Convert all elements in the returned list of tuples to strings
     for tup in query_result:
         result.append( (tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) )
+
+        def convert_to_readable_format(date):
+            """converts a date's format from YYYY-MM-DD to <Month> <Day>, <Year>"""
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+            year = date.split('-')[0]
+            month_int = int(date.split('-')[1].lstrip('0'))
+            month = months[month_int - 1]
+            day = date.split('-')[2].lstrip('0')
+            if day[-1] == '1':
+                day += 'st'
+            elif day[-1] == '2':
+                day += 'nd'
+            elif day[-1] == '3':
+                day += 'rd'
+            else:
+                day += 'th'
+            return '{m} {d}, {y}'.format(y=year, m=month, d=day)
+
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render. This format is a dictionary, whose keys are strings
     # that are referenced in the template.
-    return {'events': dict(result)}
+
+    return {'today': convert_to_readable_format(today), 'events': dict(result)}
 
 def add_event(request):
     """adds an event to the calendar"""
@@ -57,6 +113,17 @@ def add_event(request):
     date = request.params['date']
     time = request.params['time']
     request.db.cursor().execute(ADD_EVENT, [event, date, time])
+
+
+@view_config(route_name='add', request_method='POST')
+def add_event_view(request):
+    """view function to add an event to the calendar"""
+    try:
+        add_event(request)
+    except psycopg2.Error:
+        return HTTPInternalServerError
+    return HTTPFound(request.route_url('home'))
+
 
 
 def connect_db(settings):
@@ -133,6 +200,9 @@ def main():
     )
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
+    config.add_route('add', '/add')
+    config.add_route('calendar', '/calendar')
+    config.add_route('calendar_month', '/calendar_month')
     config.scan()
     app = config.make_wsgi_app()
     return app

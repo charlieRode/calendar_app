@@ -1,0 +1,11 @@
+{% extends "base.jinja2" %}
+{% block body %}
+{% for month in calendar %}
+    <h2>{{ month }}</h2>
+    <ul>
+        {% for day in calendar[month] %}
+        <li>{{ day }}</li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+{% endblock %}

@@ -159,6 +159,13 @@ def test_read_day(mock_request):
     assert result['events']['5:00 PM'] == 'Dinner'
 
 
+def test_read_calendar(mock_request):
+    from app import read_calendar
+    today = str(datetime.datetime.today()).split(' ')[0]
+    result = read_calendar(mock_request)
+    assert today in result['calendar']['March']
+
+
 def test_empty_listing(app):
     response = app.get('/')
     assert response.status_code == 200
@@ -174,7 +181,8 @@ def entry(db, request):
     INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
     """
     settings = db
-    expected = ('Dinner', '2015-03-20', '17:00:00')
+    today = str(datetime.datetime.today()).split(' ')[0]
+    expected = ('Dinner', today, '17:00:00')
     with closing(connect_db(settings)) as db:
         run_query(db, INSERT_EVENT, expected, False)
         db.commit()
@@ -194,3 +202,25 @@ def test_listing(app, entry):
     expected = ('Dinner', '5:00 PM')
     for item in expected:
         assert item in actual
+
+
+def test_calendar_view(app):
+    response = app.get('/calendar')
+    assert response.status_code == 200
+    actual = response.body
+    expected = str(datetime.datetime.today()).split(' ')[0]
+    assert expected in actual
+
+
+def test_post_to_add_view(app):
+    event_data = {
+    'description': 'Test event',
+    'date': datetime.datetime.today(),
+    'time': '10:30 AM'
+    }
+
+    response = app.post('/add', params=event_data, status='3*')
+    redirect = response.follow()
+    actual = redirect.body
+    assert 'Test event' in actual
+    assert '10:30 AM' in actual
