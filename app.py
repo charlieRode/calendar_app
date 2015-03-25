@@ -116,23 +116,23 @@ def read_day(request):
     for tup in query_result:
         result.append( (tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) )
 
-        def convert_to_readable_format(date):
-            """converts a date's format from YYYY-MM-DD to <Month> <Day>, <Year>"""
-            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-            'September', 'October', 'November', 'December']
-            year = date.split('-')[0]
-            month_int = int(date.split('-')[1].lstrip('0'))
-            month = months[month_int - 1]
-            day = date.split('-')[2].lstrip('0')
-            if day[-1] == '1':
-                day += 'st'
-            elif day[-1] == '2':
-                day += 'nd'
-            elif day[-1] == '3':
-                day += 'rd'
-            else:
-                day += 'th'
-            return '{m} {d}, {y}'.format(y=year, m=month, d=day)
+    def convert_to_readable_format(date):
+        """converts a date's format from YYYY-MM-DD to <Month> <Day>, <Year>"""
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+        'September', 'October', 'November', 'December']
+        year = date.split('-')[0]
+        month_int = int(date.split('-')[1].lstrip('0'))
+        month = months[month_int - 1]
+        day = date.split('-')[2].lstrip('0')
+        if day[-1] == '1':
+            day += 'st'
+        elif day[-1] == '2':
+            day += 'nd'
+        elif day[-1] == '3':
+            day += 'rd'
+        else:
+            day += 'th'
+        return '{m} {d}, {y}'.format(y=year, m=month, d=day)
 
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render. This format is a dictionary, whose keys are strings
