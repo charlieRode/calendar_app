@@ -1,9 +1,18 @@
 {% extends "base.jinja2" %}
 {% block body %}
-<ul>
-    {% for date in dates %}
-    <li>{{ date }}</li>
-    {% endfor %}
-</ul>
-
+<div class="entire_month">
+    <div id="month_title"></div>
+    <div id="weekdays">
+        <div class="day_of_week">Sunday</div>
+        <div class="day_of_week">Monday</div>
+        <div class="day_of_week">Tuesday</div>
+        <div class="day_of_week">Wednesday</div>
+        <div class="day_of_week">Thursday</div>
+        <div class="day_of_week">Friday</div>
+        <div class="day_of_week">Saturday</div>
+    </div>
+        {% for date in dates %}
+        <div class="day_block">{{ date }}</div>
+        {% endfor %}
+</div>
 {% endblock %}

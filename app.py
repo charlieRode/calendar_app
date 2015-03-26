@@ -75,7 +75,8 @@ def read_calendar_month(request):
     query_result = cur.fetchall()
     results = [result[0] for result in query_result]
     days_of_month = [str(date).split(' ')[0] for date in results if date.month==month]
-    return {'dates': days_of_month}
+    days = [day.split('-')[2].lstrip('0') for day in days_of_month]
+    return {'dates': days}
 
 
 

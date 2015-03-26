@@ -13,3 +13,43 @@ input[type=radio]{
 .navbutt {
     display: inline;
 }
+
+.entire_month {
+    height: 540px;
+    width: 1175px;
+    border: 4px solid black;
+}
+
+#month_title {
+    height: 60px;
+    border: 4px solid black;
+    margin-top: -4px;
+    margin-left: -4px;
+    margin-right: -4px;
+}
+
+.day_of_week {
+    display: inline-block;
+    width: 160px;
+    border: 2px solid black;
+    height: 25px;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+#weekdays {
+    border: 2px solid black;
+    margin: -4px -4px 0px -2px;
+    height: 30px;
+}
+
+.day_block {
+    height: 85px;
+    width: 160px;
+    display: inline-block;
+    border: 2px solid black;
+    padding: none;
+    margin: none;
+    text-align: right;
+}
