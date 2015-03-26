@@ -15,8 +15,8 @@ input[type=radio]{
 }
 
 .entire_month {
-    height: 540px;
-    width: 1175px;
+    height: 529px;
+    width: 1190px;
     border: 4px solid black;
 }
 
@@ -30,12 +30,14 @@ input[type=radio]{
 
 .day_of_week {
     display: inline-block;
-    width: 160px;
-    border: 2px solid black;
-    height: 25px;
+    width: 168px;
+    border: 1px solid black;
+    height: 28px;
     padding: 0;
     margin: 0;
     text-align: center;
+    line-height: 28px;
+    font-family: georgia;
 }
 
 #weekdays {
@@ -46,10 +48,12 @@ input[type=radio]{
 
 .day_block {
     height: 85px;
-    width: 160px;
+    width: 168px;
     display: inline-block;
-    border: 2px solid black;
+    border: 1px solid black;
     padding: none;
     margin: none;
     text-align: right;
+    font-size: 10pt;
+    font-family: georgia;
 }
