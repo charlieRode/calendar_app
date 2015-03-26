@@ -1,0 +1,10 @@
+.month_block {
+    height: 50px;
+    width: 100px;
+    border: 2px solid black;
+    display: block;
+}
+
+input[type=radio]{
+    visibility: hidden;
+    }

@@ -11,6 +11,11 @@ from pyramid.events import NewRequest, subscriber
 from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from waitress import serve
 
+
+# "Use the __file__ global special attribute to get the Python object
+# corresponding to the current code file." -- Cris
+here = os.path.dirname(os.path.abspath(__file__))
+
 TABLE1_SCHEMA = """
 CREATE TABLE IF NOT EXISTS days (
     date DATE PRIMARY KEY,
@@ -232,6 +237,7 @@ def main():
         session_factory=session_factory
     )
     config.include('pyramid_jinja2')
+    config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
     config.add_route('calendar', '/calendar')
