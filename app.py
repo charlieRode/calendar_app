@@ -49,7 +49,6 @@ def read_calendar(request):
             self.name = name
             self.num = num
 
-
     January = Month("January", 1)
     February = Month("February", 2)
     March = Month("March", 3)
@@ -69,14 +68,40 @@ def read_calendar(request):
 
 @view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
 def read_calendar_month(request):
-    month = int(request.params['month'])
+    the_month = int(request.params['month'])
+    # Need to get the year from request.params too
+    # For now, this year:
+    the_year = datetime.date.today().year
+    first_of_month = datetime.date(the_year, the_month, 1)
+    # Grab the strfied month:
+    month_name = first_of_month.strftime('%B')
     cur = request.db.cursor()
-    cur.execute("SELECT date FROM days")
+    cur.execute("SELECT dow FROM days WHERE date=%s", [first_of_month])
     query_result = cur.fetchall()
-    results = [result[0] for result in query_result]
-    days_of_month = [str(date).split(' ')[0] for date in results if date.month==month]
-    days = [day.split('-')[2].lstrip('0') for day in days_of_month]
-    return {'dates': days}
+    dow = query_result[0][0]
+    # Grab the first Sunday on or before the 1st of the month:
+    first_sunday = first_of_month - datetime.timedelta(dow)
+    last_saturday = first_sunday + datetime.timedelta(41)
+    cur.execute("SELECT date FROM days WHERE date >= %s AND date <= %s", [first_sunday, last_saturday])
+    query_result = cur.fetchall()
+    # Reformat
+    days = [str(result[0]).split('-')[2].lstrip('0') for result in query_result]
+    return {'dates': days, 'month': month_name}
+
+
+
+#@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
+#def read_calendar_month(request):
+#    month_int = int(request.params['month'])
+#    cur = request.db.cursor()
+#    cur.execute("SELECT date, dow FROM days")
+#    query_result = cur.fetchall()
+#    month_starts_on = query_result
+#    results = [result[0] for result in query_result]
+#    month_name = results[0].strftime('%B')
+#    days_of_month = [str(date).split(' ')[0] for date in results if date.month==month_int]
+#    days = [day.split('-')[2].lstrip('0') for day in days_of_month]
+#    return {'dates': days, 'month': month_name}
 
 
 
@@ -183,11 +208,11 @@ def init_db():
         INSERT_DAY = """
         INSERT INTO days (date, dow) VALUES (%s, %s)
         """
-        date = datetime.datetime.today()
+        date = datetime.date.today()
         dow = (date.weekday() + 1) % 7  # <- Sunday: 0, Monday : 1, ..., Saturday: 6
         with closing(connect_db(settings)) as db:
             for i in xrange(365):
-                db.cursor().execute(INSERT_DAY, [str(date).split(" ")[0], dow])
+                db.cursor().execute(INSERT_DAY, [date, dow])
                 date += datetime.timedelta(1)
                 dow = (date.weekday() + 1) % 7
             db.commit()
