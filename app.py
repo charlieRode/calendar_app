@@ -89,51 +89,6 @@ def read_calendar_month(request):
     return {'dates': days, 'month': month_name}
 
 
-
-#@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
-#def read_calendar_month(request):
-#    month_int = int(request.params['month'])
-#    cur = request.db.cursor()
-#    cur.execute("SELECT date, dow FROM days")
-#    query_result = cur.fetchall()
-#    month_starts_on = query_result
-#    results = [result[0] for result in query_result]
-#    month_name = results[0].strftime('%B')
-#    days_of_month = [str(date).split(' ')[0] for date in results if date.month==month_int]
-#    days = [day.split('-')[2].lstrip('0') for day in days_of_month]
-#    return {'dates': days, 'month': month_name}
-
-
-
-
-#@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
-#def read_calendar_month(request):
-#    cur = request.db.cursor()
-#    cur.execute("SELECT date FROM days")
-#    query_result = cur.fetchall()
-#    results = [result[0] for result in query_result]
-#    jan = [str(date).split(' ')[0] for date in results if date.month==1]
-#    feb = [str(date).split(' ')[0] for date in results if date.month==2]
-#    march = [str(date).split(' ')[0] for date in results if date.month==3]
-#    april = [str(date).split(' ')[0] for date in results if date.month==4]
-#    may = [str(date).split(' ')[0] for date in results if date.month==5]
-#    june = [str(date).split(' ')[0] for date in results if date.month==6]
-#    july = [str(date).split(' ')[0] for date in results if date.month==7]
-#    aug = [str(date).split(' ')[0] for date in results if date.month==8]
-#    sept = [str(date).split(' ')[0] for date in results if date.month==9]
-#    octb = [str(date).split(' ')[0] for date in results if date.month==10]
-#    nov = [str(date).split(' ')[0] for date in results if date.month==11]
-#    dec = [str(date).split(' ')[0] for date in results if date.month==12]
-#    calendar = {'January': jan, 'February': feb, 'March': march, 'April': april, 'May': may,
-#    'June': june, 'July': july, 'August': aug, 'September': sept, 'October': octb,
-#    'November': nov, 'December': dec}
-    # Since calendar is a dictionary, the months will not be displayed in order.
-    # As of now, I'm not sure what the best approach to fix this is.
-    # Will come back to it later.
-#    return {'calendar': calendar}
-
-
-
 @view_config(route_name='home', renderer='templates/day.jinja2')
 def read_day(request):
     # We want the main view page to always display today's events
