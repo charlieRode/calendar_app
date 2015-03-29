@@ -86,7 +86,7 @@ def read_calendar_month(request):
     query_result = cur.fetchall()
     # Reformat
     days = [str(result[0]).split('-')[2].lstrip('0') for result in query_result]
-    return {'dates': days, 'month': month_name}
+    return {'dates': days, 'month_name': month_name, 'the_month': the_month, 'the_year': the_year}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
