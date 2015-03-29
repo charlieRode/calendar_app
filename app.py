@@ -69,6 +69,8 @@ def read_calendar(request):
 @view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
 def read_calendar_month(request):
     the_month = int(request.params['month'])
+    prev_month = 12 if the_month == 1 else the_month - 1
+    next_month = 1 if the_month == 12 else the_month + 1
     # Need to get the year from request.params too
     # For now, this year:
     the_year = datetime.date.today().year
@@ -86,7 +88,8 @@ def read_calendar_month(request):
     query_result = cur.fetchall()
     # Reformat
     days = [str(result[0]).split('-')[2].lstrip('0') for result in query_result]
-    return {'dates': days, 'month_name': month_name, 'the_month': the_month, 'the_year': the_year}
+    return {'dates': days, 'month_name': month_name, 'the_month': the_month, 'the_year': the_year,
+    'prev_month': prev_month, 'next_month': next_month}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')

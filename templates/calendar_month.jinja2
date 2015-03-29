@@ -1,7 +1,21 @@
 {% extends "base.jinja2" %}
 {% block body %}
 <div class="entire_month">
-    <div id="month_title">{{ month_name }}</div>
+    <div id="month_title">
+        <div style="display: inline-block; float: left; height: 60px; width: 60px">
+        <form action="{{ request.route_url('calendar_month') }}" method ="GET">
+            <label for="{{ prev_month }}"><div class="scroll_left"><<</div></label>
+            <input class="scroll_left" type="radio" id="{{ prev_month }}" name="month" value="{{ prev_month}}"/>
+        </form>
+        </div>
+        {{ month_name }}
+        <div style="display: inline-block; float: right; height: 60px; width: 60px">
+        <form action="{{ request.route_url('calendar_month') }}" method ="GET">
+            <label for="{{ next_month }}"><div class="scroll_right">>></div></label>
+            <input class="scroll_right" type="radio" id="{{ next_month }}" name="month" value="{{ next_month }}"/>
+        </form>
+        </div>
+    </div>
     <div id="weekdays">
         <div class="day_of_week">Sunday</div><!--
         --><div class="day_of_week">Monday</div><!--
