@@ -8,10 +8,16 @@
 
 input[type=radio]{
     visibility: hidden;
+    display: none;
     }
 
 .navbutt {
     display: inline;
+}
+
+.tables {
+    font-size: 20pt;
+    background-color: beige;
 }
 
 .entire_month {
@@ -21,6 +27,9 @@ input[type=radio]{
 }
 
 #month_title {
+    font-family: georgia;
+    font-size: 30pt;
+    text-align: center;
     height: 60px;
     border: 4px solid black;
     margin-top: -4px;
@@ -56,4 +65,19 @@ input[type=radio]{
     text-align: right;
     font-size: 10pt;
     font-family: georgia;
+}
+
+.scroll_right {
+    font-size: 30pt;
+    float: right;
+    width: 50px;
+}
+
+.scroll_left {
+    font-size: 30pt;
+    width: 50px;
+}
+
+.add_event {
+    display: none;
 }

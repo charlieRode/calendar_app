@@ -41,6 +41,25 @@ logging.basicConfig()
 log = logging.getLogger(__file__)
 
 
+def convert_to_readable_format(date):
+    """converts a date's format from YYYY-MM-DD to <Month> <Day>, <Year>"""
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December']
+    year = date.split('-')[0]
+    month_int = int(date.split('-')[1].lstrip('0'))
+    month = months[month_int - 1]
+    day = date.split('-')[2].lstrip('0')
+    if day[-1] == '1':
+        day += 'st'
+    elif day[-1] == '2':
+        day += 'nd'
+    elif day[-1] == '3':
+        day += 'rd'
+    else:
+        day += 'th'
+    return '{m} {d}, {y}'.format(y=year, m=month, d=day)
+
+
 @view_config(route_name='calendar', renderer='templates/calendar.jinja2')
 def read_calendar(request):
 
@@ -69,6 +88,8 @@ def read_calendar(request):
 @view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
 def read_calendar_month(request):
     the_month = int(request.params['month'])
+    prev_month = 12 if the_month == 1 else the_month - 1
+    next_month = 1 if the_month == 12 else the_month + 1
     # Need to get the year from request.params too
     # For now, this year:
     the_year = datetime.date.today().year
@@ -86,7 +107,19 @@ def read_calendar_month(request):
     query_result = cur.fetchall()
     # Reformat
     days = [str(result[0]).split('-')[2].lstrip('0') for result in query_result]
-    return {'dates': days, 'month': month_name}
+    return {'dates': days, 'month_name': month_name, 'the_month': the_month, 'the_year': the_year,
+    'prev_month': prev_month, 'next_month': next_month}
+
+
+@view_config(route_name='date', renderer='templates/date.jinja2')
+def read_date(request):
+    date = request.params['date']
+    readable_date = convert_to_readable_format(date)
+    cur = request.db.cursor()
+    cur.execute(RETRIEVE_DAY, [date])
+    query_result = cur.fetchall()
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) for tup in query_result]
+    return {'date': date, 'readable_date': readable_date, 'events': dict(result)}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
@@ -101,25 +134,6 @@ def read_day(request):
     # Convert all elements in the returned list of tuples to strings
     for tup in query_result:
         result.append( (tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) )
-
-    def convert_to_readable_format(date):
-        """converts a date's format from YYYY-MM-DD to <Month> <Day>, <Year>"""
-        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-        'September', 'October', 'November', 'December']
-        year = date.split('-')[0]
-        month_int = int(date.split('-')[1].lstrip('0'))
-        month = months[month_int - 1]
-        day = date.split('-')[2].lstrip('0')
-        if day[-1] == '1':
-            day += 'st'
-        elif day[-1] == '2':
-            day += 'nd'
-        elif day[-1] == '3':
-            day += 'rd'
-        else:
-            day += 'th'
-        return '{m} {d}, {y}'.format(y=year, m=month, d=day)
-
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render. This format is a dictionary, whose keys are strings
     # that are referenced in the template.
@@ -221,6 +235,7 @@ def main():
     config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('date', '/date')
     config.add_route('calendar', '/calendar')
     config.add_route('calendar_month', '/calendar_month')
     config.scan()
