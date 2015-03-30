@@ -4,8 +4,8 @@
 <table class="tables" border="1px" width="600px">
     {% for event in events %}
     <tr>
-        <td width="30%">{{ event }}</td>
-        <td width="70%">{{ events[event] }}</td>
+        <td width="30%">{{ event[0] }}</td>
+        <td width="70%">{{ event[1] }}</td>
     </tr>
     {% endfor %}
 </table>

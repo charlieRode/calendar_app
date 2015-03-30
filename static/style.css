@@ -18,6 +18,7 @@ input[type=radio]{
 .tables {
     font-size: 20pt;
     background-color: beige;
+    text-align: right;
 }
 
 .entire_month {

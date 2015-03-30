@@ -34,7 +34,7 @@ INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
 """
 
 RETRIEVE_DAY = """
-SELECT time, description from events WHERE date=%s;
+SELECT time, description from events WHERE date=%s ORDER BY time ASC;
 """
 
 logging.basicConfig()
@@ -119,7 +119,7 @@ def read_date(request):
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
     result = [(tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) for tup in query_result]
-    return {'date': date, 'readable_date': readable_date, 'events': dict(result)}
+    return {'date': date, 'readable_date': readable_date, 'events': result}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
