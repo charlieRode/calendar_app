@@ -1,0 +1,23 @@
+{% extends "base.jinja2" %}
+{% block body %}
+<p>{{ readable_date }}</p>
+<table class="tables" border="1px" width="600px">
+    {% for event in events %}
+    <tr>
+        <td width="30%">{{ event }}</td>
+        <td width="70%">{{ events[event] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<aside>
+    <button id="reveal_form" type="button"> + </button>
+    <div class="add_event">
+        <form action="{{request.route_url('add')}}" method="POST">
+                <input type="text" size="50" name="description" value="Event description"/>
+                <input type="time" name="time"/>
+                <input type="hidden" value="{{ date }}" name="date"/>
+                <input type="submit" value="Submit" name="Submit"/>
+        </form>
+    </div>
+</aside>
+{% endblock %}

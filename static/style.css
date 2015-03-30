@@ -8,10 +8,16 @@
 
 input[type=radio]{
     visibility: hidden;
+    display: none;
     }
 
 .navbutt {
     display: inline;
+}
+
+.tables {
+    font-size: 20pt;
+    background-color: beige;
 }
 
 .entire_month {
@@ -70,4 +76,8 @@ input[type=radio]{
 .scroll_left {
     font-size: 30pt;
     width: 50px;
+}
+
+.add_event {
+    display: none;
 }
