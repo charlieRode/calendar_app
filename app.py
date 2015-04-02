@@ -34,7 +34,7 @@ INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
 """
 
 RETRIEVE_DAY = """
-SELECT time, description from events WHERE date=%s;
+SELECT time, description from events WHERE date=%s ORDER BY time ASC;
 """
 
 logging.basicConfig()
@@ -119,7 +119,7 @@ def read_date(request):
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
     result = [(tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) for tup in query_result]
-    return {'date': date, 'readable_date': readable_date, 'events': dict(result)}
+    return {'date': date, 'readable_date': readable_date, 'events': result}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
@@ -155,8 +155,14 @@ def add_event_view(request):
         add_event(request)
     except psycopg2.Error:
         return HTTPInternalServerError
-    return HTTPFound(request.route_url('home'))
-
+    # Since the URL named 'date' requires form information to render,
+    # we cannot simply return HTTPFound(request.route_url('date')).
+    # The form information we need is appended to the URL in the form of
+    # "?date=<some date>". We can grab this information from the request object
+    # and return a route suitable for HTTPFound() with everything we need.
+    date = request.params['date']
+    route = '/date?date={date}'.format(date=date)
+    return HTTPFound(route)
 
 
 def connect_db(settings):
