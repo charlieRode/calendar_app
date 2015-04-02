@@ -155,8 +155,14 @@ def add_event_view(request):
         add_event(request)
     except psycopg2.Error:
         return HTTPInternalServerError
-    return HTTPFound(request.route_url('home'))
-
+    # Since the URL named 'date' requires form information to render,
+    # we cannot simply return HTTPFound(request.route_url('date')).
+    # The form information we need is appended to the URL in the form of
+    # "?date=<some date>". We can grab this information from the request object
+    # and return a route suitable for HTTPFound() with everything we need.
+    date = request.params['date']
+    route = '/date?date={date}'.format(date=date)
+    return HTTPFound(route)
 
 
 def connect_db(settings):

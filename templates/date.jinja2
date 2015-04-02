@@ -13,10 +13,10 @@
     <button id="reveal_form" type="button"> + </button>
     <div class="add_event">
         <form action="{{request.route_url('add')}}" method="POST">
-                <input type="text" size="50" name="description" value="Event description"/>
-                <input type="time" name="time"/>
+                <input type="time" name="time" class="new_entry" width="100px"/>
+                <input type="text" size="50" name="description" value="Event description" class="new_entry" width="500px"/>
                 <input type="hidden" value="{{ date }}" name="date"/>
-                <input type="submit" value="Submit" name="Submit"/>
+                <input type="submit" value="Submit" name="Submit" class="btn"/>
         </form>
     </div>
 </aside>
