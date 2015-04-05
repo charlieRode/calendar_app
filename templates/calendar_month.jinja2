@@ -1,22 +1,30 @@
 {% extends "base.jinja2" %}
 {% block body %}
-<div class="entire_month">
-    <div id="month_title">
-        <div style="display: inline-block; float: left; height: 60px; width: 60px">
-        <form action="{{ request.route_url('calendar_month') }}" method="GET">
-            <label for="{{ prev_month }}"><div class="scroll_left"><<</div></label>
-            <input class="scroll_left" type="radio" id="{{ prev_month }}" name="month" value="{{ prev_month}}"/>
-        </form>
+<div class="container">
+    <div class="row vert_center" style="border: 1px solid grey; height: 70px;">
+        <div class="col-md-3">
+            <form action="{{ request.route_url('calendar_month') }}" method="GET">
+                <label class="scroll_left">
+                    <button type="radio" id="{{ prev_month }}" name="month" value="{{ prev_month }}" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    </button>
+                </label>
+            </form>
         </div>
-        {{ month_name }}
-        <div style="display: inline-block; float: right; height: 60px; width: 60px">
-        <form action="{{ request.route_url('calendar_month') }}" method="GET">
-            <label for="{{ next_month }}"><div class="scroll_right">>></div></label>
-            <input class="scroll_right" type="radio" id="{{ next_month }}" name="month" value="{{ next_month }}"/>
-        </form>
+        <div class="col-md-6 month_title">
+                {{ month_name }}
+        </div>
+        <div class="col-md-3">
+            <form action="{{ request.route_url('calendar_month') }}" method="GET">
+                    <label class="scroll_right">
+                        <button type="radio" id="{{ next_month }}" name="month" value="{{ next_month }}" class="btn btn-default btn-lg">
+                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        </button>
+                    </label>
+            </form>
         </div>
     </div>
-    <div id="weekdays">
+    <div class="row">
         <div class="day_of_week">Sunday</div><!--
         --><div class="day_of_week">Monday</div><!--
         --><div class="day_of_week">Tuesday</div><!--
@@ -26,12 +34,54 @@
         --><div class="day_of_week">Saturday</div>
     </div>
         <form action="{{ request.route_url('date') }}" method="GET">
-            {% for date in dates -%}
+            <div class="row">{% for date in dates[:7] -%}
             <label for="{{ the_year }}-{{ the_month }}-{{ date }}"><!--
-            --><div class="day_block">{{ date }}</div><!--
-            --></label><!--
-            --><input type="radio" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>
-            {%- endfor %}
+            --><div class="day_block">
+                    {{ date }}
+                </div><!--
+        --></label><!--
+            --><input type="radio" style="display: none;" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>            
+            {%- endfor %}</div>
+            <div class="row row_calendar">{% for date in dates[7:14] -%}
+            <label for="{{ the_year }}-{{ the_month }}-{{ date }}"><!--
+            --><div class="day_block">
+                    {{ date }}
+                </div><!--
+        --></label><!--
+            --><input type="radio" style="display: none;" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>            
+            {%- endfor %}</div>
+            <div class="row row_calendar">{% for date in dates[14:21] -%}
+            <label for="{{ the_year }}-{{ the_month }}-{{ date }}"><!--
+            --><div class="day_block">
+                    {{ date }}
+                </div><!--
+        --></label><!--
+            --><input type="radio" style="display: none;" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>            
+            {%- endfor %}</div>
+            <div class="row row_calendar">{% for date in dates[21:28] -%}
+            <label for="{{ the_year }}-{{ the_month }}-{{ date }}"><!--
+            --><div class="day_block">
+                    {{ date }}
+                </div><!--
+        --></label><!--
+            --><input type="radio" style="display: none;" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>            
+            {%- endfor %}</div>
+            <div class="row row_calendar">{% for date in dates[28:35] -%}
+            <label for="{{ the_year }}-{{ the_month }}-{{ date }}"><!--
+            --><div class="day_block">
+                    {{ date }}
+                </div><!--
+        --></label><!--
+            --><input type="radio" style="display: none;" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>            
+            {%- endfor %}</div>
+            <div class="row row_calendar">{% for date in dates[35:42] -%}
+            <label for="{{ the_year }}-{{ the_month }}-{{ date }}"><!--
+            --><div class="day_block">
+                    {{ date }}
+                </div><!--
+        --></label><!--
+            --><input type="radio" style="display: none;" id="{{ the_year }}-{{ the_month }}-{{ date }}" name="date" value="{{ the_year }}-{{ the_month }}-{{ date }}"/>            
+            {%- endfor %}</div>
         </form>
 </div>
 {% endblock %}

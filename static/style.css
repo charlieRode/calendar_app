@@ -1,115 +1,52 @@
-.month_block {
-    height: 150px;
-    width: 300px;
-    border: 2px solid black;
-    margin: 5px;
-    display: inline-block;
+.darkBG {
+    background: #999;
 }
 
-input[type=radio]{
-    visibility: hidden;
-    display: none;
-    }
-
-.navbutt {
-    display: inline;
+.darkerBG {
+    background: #666;
 }
 
-.tables {
-    font-size: 20pt;
-    background-color: beige;
-    text-align: right;
+.darkestBG {
+    background: #333;
 }
 
-.entire_month {
-    height: 616px;
-    width: 1190px;
-    border: 4px solid black;
-}
-
-#month_title {
-    font-family: georgia;
-    font-size: 30pt;
+.month_title {
     text-align: center;
-    height: 60px;
-    border: 4px solid black;
-    margin-top: -4px;
-    margin-left: -4px;
-    margin-right: -4px;
+    font-size: 36px;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.scroll_left {
+    float: left;
+}
+
+.scroll_right {
+    float: right;
+}
+
+.vert_center {
+    display: flex;
+    align-items: center;
 }
 
 .day_of_week {
     display: inline-block;
-    width: 168px;
-    border: 1px solid black;
-    height: 28px;
-    padding: 0;
-    margin: 0;
+    border: 1px solid grey;
+    margin: -1px -1px -1px 0px;
     text-align: center;
-    line-height: 28px;
-    font-family: georgia;
-}
-
-#weekdays {
-    border: 2px solid black;
-    margin: -4px -4px 0px -2px;
-    height: 30px;
+    width: 14.38%;
+    
 }
 
 .day_block {
-    height: 85px;
-    width: 168px;
+    border: 1px solid grey;
     display: inline-block;
-    border: 1px solid black;
-    padding: none;
-    margin: none;
-    text-align: right;
-    font-size: 10pt;
-    font-family: georgia;
+    margin-right: -1px;
+    height: 140px;
+    width: 139.486px;
 }
 
-.scroll_right {
-    font-size: 30pt;
-    float: right;
-    width: 50px;
-}
-
-.scroll_left {
-    font-size: 30pt;
-    width: 50px;
-}
-
-.add_event {
-    display: none;
-}
-
-.new_entry {
-    background-color: #D4C6A9
-}
-
-.btn {
-  background: #858585;
-  background-image: -webkit-linear-gradient(top, #858585, #4f4f4f);
-  background-image: -moz-linear-gradient(top, #858585, #4f4f4f);
-  background-image: -ms-linear-gradient(top, #858585, #4f4f4f);
-  background-image: -o-linear-gradient(top, #858585, #4f4f4f);
-  background-image: linear-gradient(to bottom, #858585, #4f4f4f);
-  -webkit-border-radius: 28;
-  -moz-border-radius: 28;
-  border-radius: 28px;
-  font-family: Arial;
-  color: #ffffff;
-  font-size: 15px;
-  padding: 5px 15px 5px 15px;
-  text-decoration: none;
-}
-
-.btn:hover {
-  background: #3cb0fd;
-  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
-  text-decoration: none;
+.row_calendar {
+    margin-top: -6px;
 }

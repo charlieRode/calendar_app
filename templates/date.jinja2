@@ -10,14 +10,28 @@
     {% endfor %}
 </table>
 <aside>
-    <button id="reveal_form" type="button"> + </button>
-    <div class="add_event">
-        <form action="{{request.route_url('add')}}" method="POST">
-                <input type="time" name="time" class="new_entry" width="100px"/>
-                <input type="text" size="50" name="description" value="Event description" class="new_entry" width="500px"/>
-                <input type="hidden" value="{{ date }}" name="date"/>
-                <input type="submit" value="Submit" name="Submit" class="btn"/>
-        </form>
+    <div class="container">
+        <div class="row">
+            <form action="{{request.route_url('add')}}" method="POST">
+                <div class="input-group">
+                  <input type="text" class="form-control" aria-label="..." placeholder="Event description" name="description"/>
+                  <div class="input-group-btn">
+                    <!-- Button and dropdown menu -->
+                    <button type="button" class="btn btn-default">Repeat</button>
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Never</a></li>
+                        <li><a href="#">Every week</a></li>
+                        <li><a href="#">Every other week</a></li>
+                        <li><a href='#'>Every month</a></li>
+                      </ul>
+                  </div>
+                </div>
+            </form>
+        </div>
     </div>
 </aside>
 {% endblock %}
