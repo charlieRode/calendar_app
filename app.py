@@ -33,8 +33,12 @@ ADD_EVENT = """
 INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
 """
 
+REMOVE_EVENT = """
+DELETE FROM events WHERE description=%s
+"""
+
 RETRIEVE_DAY = """
-SELECT time, description from events WHERE date=%s ORDER BY time ASC;
+SELECT time, description from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -140,6 +144,26 @@ def read_day(request):
 
     return {'today': convert_to_readable_format(today), 'events': dict(result)}
 
+
+def delete_event(request):
+    """removes an event from the calendar"""
+    event = request.params['description']
+    request.db.cursor().execute(REMOVE_EVENT, [event])
+
+
+@view_config(route_name='delete', request_method='POST')
+def delete_event_view(request):
+    """view function to remove an event from the calendar"""
+    try:
+        delete_event(request)
+    except psycopg2.Error:
+        return HTTPInternalServerError
+
+    date = request.params['date']
+    route = '/date?date={date}'.format(date=date)
+    return HTTPFound(route)
+
+
 def add_event(request):
     """adds an event to the calendar"""
     event = request.params['description']
@@ -241,6 +265,7 @@ def main():
     config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('delete', '/delete')
     config.add_route('date', '/date')
     config.add_route('calendar', '/calendar')
     config.add_route('calendar_month', '/calendar_month')

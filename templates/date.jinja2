@@ -1,37 +1,55 @@
 {% extends "base.jinja2" %}
 {% block body %}
-<p>{{ readable_date }}</p>
-<table class="tables" border="1px" width="600px">
-    {% for event in events %}
-    <tr>
-        <td width="30%">{{ event[0] }}</td>
-        <td width="70%">{{ event[1] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="container">
+    <h2 style="color: #337ab7;">{{ readable_date }}</h2>
+    <table class="table table-striped">
+        {% for event in events %}
+        <tr>
+            <td width="30%">{{ event[0] }}</td>
+            <td width="60%">{{ event[1] }}</td>
+            <td width="10%">
+                <form action="{{request.route_url('delete')}}" method="POST">
+                    <div class="form-group">
+                        <input type="hidden" name="date" value="{{ date }}"/>
+                        <button type="submit" value="{{ event[1] }}" name="description" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 <aside>
     <div class="container">
-        <div class="row">
+        <div class="well">
             <form action="{{request.route_url('add')}}" method="POST">
                 <input type="hidden" name="date" value="{{ date }}"/>
-                <input type="text" class="form-control" aria-label="..." placeholder="Event description" name="description"/>
+                <div class="form-group">
+                    <label for="description">Add Event</label>
+                    <input id="description" type="text" class="form-control" aria-label="..." placeholder="Event description" name="description"/>
+                </div>
+                <div class="form-group">
                     <div class="input-group">
-                    <!-- Button and dropdown menu -->
-                    <div class="bfh-timepicker" data-mode="12h" data-name="time"></div>
-                    <div class="input-group-btn">
-                    <button type="button" class="btn btn-default">Repeat</button>
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Never</a></li>
-                        <li><a href="#">Every week</a></li>
-                        <li><a href="#">Every other week</a></li>
-                        <li><a href='#'>Every month</a></li>
-                    </ul>
-                    <button type="submit" class="btn btn-default">Submit</button>
-                  </div>
+                        <!-- Button and dropdown menu -->
+                        
+                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time"></div>
+                        <div class="input-group-btn">
+                        <button type="button" class="btn btn-default">Repeat</button>
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Never</a></li>
+                            <li><a href="#">Every week</a></li>
+                            <li><a href="#">Every other week</a></li>
+                            <li><a href='#'>Every month</a></li>
+                        </ul>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                      </div>
+                    </div>
                 </div>
             </form>
         </div>
