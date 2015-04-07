@@ -33,8 +33,12 @@ ADD_EVENT = """
 INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
 """
 
+REMOVE_EVENT = """
+DELETE FROM events WHERE description=%s
+"""
+
 RETRIEVE_DAY = """
-SELECT time, description from events WHERE date=%s ORDER BY time ASC;
+SELECT time, description from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -105,15 +109,15 @@ def read_calendar_month(request):
     last_saturday = first_sunday + datetime.timedelta(41)
     cur.execute("SELECT date FROM days WHERE date >= %s AND date <= %s", [first_sunday, last_saturday])
     query_result = cur.fetchall()
-    # Reformat
-    days = [str(result[0]).split('-')[2].lstrip('0') for result in query_result]
-    return {'dates': days, 'month_name': month_name, 'the_month': the_month, 'the_year': the_year,
+    # Format results as list of date objects
+    dates = [result[0] for result in query_result]
+    return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
     'prev_month': prev_month, 'next_month': next_month}
 
 
 @view_config(route_name='date', renderer='templates/date.jinja2')
 def read_date(request):
-    date = request.params['date']
+    date = str(request.params['date'])
     readable_date = convert_to_readable_format(date)
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
@@ -139,6 +143,26 @@ def read_day(request):
     # that are referenced in the template.
 
     return {'today': convert_to_readable_format(today), 'events': dict(result)}
+
+
+def delete_event(request):
+    """removes an event from the calendar"""
+    event = request.params['description']
+    request.db.cursor().execute(REMOVE_EVENT, [event])
+
+
+@view_config(route_name='delete', request_method='POST')
+def delete_event_view(request):
+    """view function to remove an event from the calendar"""
+    try:
+        delete_event(request)
+    except psycopg2.Error:
+        return HTTPInternalServerError
+
+    date = request.params['date']
+    route = '/date?date={date}'.format(date=date)
+    return HTTPFound(route)
+
 
 def add_event(request):
     """adds an event to the calendar"""
@@ -241,6 +265,7 @@ def main():
     config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('delete', '/delete')
     config.add_route('date', '/date')
     config.add_route('calendar', '/calendar')
     config.add_route('calendar_month', '/calendar_month')
