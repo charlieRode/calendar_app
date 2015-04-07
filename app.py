@@ -109,15 +109,15 @@ def read_calendar_month(request):
     last_saturday = first_sunday + datetime.timedelta(41)
     cur.execute("SELECT date FROM days WHERE date >= %s AND date <= %s", [first_sunday, last_saturday])
     query_result = cur.fetchall()
-    # Reformat
-    days = [str(result[0]).split('-')[2].lstrip('0') for result in query_result]
-    return {'dates': days, 'month_name': month_name, 'the_month': the_month, 'the_year': the_year,
+    # Format results as list of date objects
+    dates = [result[0] for result in query_result]
+    return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
     'prev_month': prev_month, 'next_month': next_month}
 
 
 @view_config(route_name='date', renderer='templates/date.jinja2')
 def read_date(request):
-    date = request.params['date']
+    date = str(request.params['date'])
     readable_date = convert_to_readable_format(date)
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])

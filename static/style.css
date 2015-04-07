@@ -32,15 +32,24 @@
 
 .day_of_week {
     display: inline-block;
-    border: 1px solid grey;
+    border: 1px solid #337ab7;
     margin: -1px -1px -1px 0px;
-    text-align: center;
     width: 14.38%;
-    
+    text-align: center;
+}
+
+.daynum {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    color: grey;
 }
 
 .day_block {
-    border: 1px solid grey;
+    border: 1px solid #337ab7;
     display: inline-block;
     margin-right: -1px;
     height: 140px;
@@ -49,4 +58,8 @@
 
 .row_calendar {
     margin-top: -6px;
+}
+
+.diff_month {
+    background-color: #EBEBEB;
 }
