@@ -26,11 +26,12 @@ CREATE TABLE IF NOT EXISTS events (
     id serial PRIMARY KEY,
     description TEXT NOT NULL,
     date DATE REFERENCES days(date) NOT NULL,
-    time TIME NOT NULL)
+    time TIME NOT NULL,
+    time_end TIME NOT NULL)
 """
 
 ADD_EVENT = """
-INSERT INTO events (description, date, time) VALUES (%s, %s, %s)
+INSERT INTO events (description, date, time, time_end) VALUES (%s, %s, %s, %s)
 """
 
 REMOVE_EVENT = """
@@ -38,7 +39,7 @@ DELETE FROM events WHERE description=%s
 """
 
 RETRIEVE_DAY = """
-SELECT time, description from events WHERE date=%s ORDER BY time ASC
+SELECT time, time_end, description from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -122,7 +123,8 @@ def read_date(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) for tup in query_result]
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2])) for tup in query_result]
+    # For each event in 'events', event[0] is start time, event[1] is end time, event[2] is description
     return {'date': date, 'readable_date': readable_date, 'events': result}
 
 
@@ -134,15 +136,11 @@ def read_day(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [today])
     query_result = cur.fetchall()
-    result = []
-    # Convert all elements in the returned list of tuples to strings
-    for tup in query_result:
-        result.append( (tup[0].strftime('%I:%M %p').lstrip('0'), str(tup[1])) )
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2])) for tup in query_result]
     # Our view function needs to return the packaged information we've requested in a format
-    # that our jinja2 template can render. This format is a dictionary, whose keys are strings
-    # that are referenced in the template.
+    # that our jinja2 template can render.
 
-    return {'today': convert_to_readable_format(today), 'events': dict(result)}
+    return {'today': convert_to_readable_format(today), 'events': result}
 
 
 def delete_event(request):
@@ -169,7 +167,10 @@ def add_event(request):
     event = request.params['description']
     date = request.params['date']
     time = request.params['time']
-    request.db.cursor().execute(ADD_EVENT, [event, date, time])
+    time_end = request.params['time_end']
+    if time_end < time:
+        raise ValueError('End time must be later than start time')
+    request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
 
 
 @view_config(route_name='add', request_method='POST')
@@ -207,7 +208,9 @@ def init_db():
         INSERT_DAY = """
         INSERT INTO days (date, dow) VALUES (%s, %s)
         """
-        date = datetime.date.today()
+        # I am starting the database on Jan 1st of the current year.
+        # I will need to update this for the next year if this project turns out.
+        date = datetime.date(2015, 1, 1)
         dow = (date.weekday() + 1) % 7  # <- Sunday: 0, Monday : 1, ..., Saturday: 6
         with closing(connect_db(settings)) as db:
             for i in xrange(365):
