@@ -5,13 +5,13 @@
     <table class="table table-striped">
         {% for event in events %}
         <tr>
-            <td width="30%">{{ event[0] }}</td>
-            <td width="60%">{{ event[1] }}</td>
+            <td width="30%">{{ event[0] }} - {{ event[1] }}</td>
+            <td width="60%">{{ event[2] }}</td>
             <td width="10%">
                 <form action="{{request.route_url('delete')}}" method="POST">
                     <div class="form-group">
                         <input type="hidden" name="date" value="{{ date }}"/>
-                        <button type="submit" value="{{ event[1] }}" name="description" class="btn btn-default btn-sm">
+                        <button type="submit" value="{{ event[2] }}" name="description" class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -33,8 +33,9 @@
                 <div class="form-group">
                     <div class="input-group">
                         <!-- Button and dropdown menu -->
-                        
-                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time"></div>
+                        <label for="time">Start Time - End Time</label>
+                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time" id="time"></div>
+                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time_end" id="time_end"></div>
                         <div class="input-group-btn">
                         <button type="button" class="btn btn-default">Repeat</button>
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
