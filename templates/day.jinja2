@@ -6,7 +6,7 @@
     </div>
     {% for event in events %}
     <div class="row">
-        <div class="panel panel-success" id="{{ loop.index }}">
+        <div class="panel panel-success" data-start-time="{{ event [0] }}" data-end-time="{{ event[1] }}">
             <div class="panel-heading">
                 <h3 class="panel-title">{{ event[0] }} - {{ event[1] }}</h3>
             </div>
@@ -15,21 +15,19 @@
             </div>
         </div>
     </div>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script>
-        var theDate = new Date();
-        var currentDate = (theDate.getMonth() + 1) + "/" + theDate.getDate() + "/" + theDate.getFullYear();
-        var startTime = new Date("{{ event[0] }} " + currentDate);
-        var endTime = new Date("{{ event[1] }} " + currentDate);
-
-        if (theDate > startTime && theDate < endTime) {
-            $('#{{ loop.index }}').switchClass('panel-success', 'panel-warning');
-        }else if(theDate > endTime) {
-            $('#{{ loop.index }}').switchClass('panel-success', 'panel-default');
-        }
-
-    </script>
+//        var theDate = new Date();
+//        var currentDate = (theDate.getMonth() + 1) + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+//        var startTime = new Date("{{ event[0] }} " + currentDate);
+//        var endTime = new Date("{{ event[1] }} " + currentDate);
+//
+//        if (theDate > startTime && theDate < endTime) {
+//            $('#{{ loop.index }}').switchClass('panel-success', 'panel-warning');
+//        }else if(theDate > endTime) {
+//            $('#{{ loop.index }}').switchClass('panel-success', 'panel-default');
+//        }
+//
+   </script>
     {% else %}
     <div class="row">
         <div class="col-md-6">
