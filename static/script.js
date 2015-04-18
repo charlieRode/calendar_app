@@ -20,7 +20,7 @@ var applyPanelClass = function() {
 }   
 
 $(document).ready(function() {
-    $('input[type=radio]').click(function() {
+    $('.radio-button').click(function() {
         $(this).closest("form").submit();
     });
 

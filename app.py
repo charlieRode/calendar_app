@@ -164,13 +164,38 @@ def delete_event_view(request):
 
 def add_event(request):
     """adds an event to the calendar"""
+    final_date = datetime.date(datetime.date.today().year, 12, 31)
+    repeat = request.params['repeat']
     event = request.params['description']
     date = request.params['date']
     time = request.params['time']
     time_end = request.params['time_end']
+    date_nums = date.split('-')
+    current = datetime.date(int(date_nums[0]), int(date_nums[1]), int(date_nums[2]))
     if time_end < time:
         raise ValueError('End time must be later than start time')
-    request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
+    if repeat == 'never':
+        request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
+    elif repeat == 'monthly':
+        the_day = int(date_nums[2])
+        current_month = int(date_nums[1])
+        while current_month <= 12:
+            date = datetime.date(int(date_nums[0]), current_month, the_day)
+            request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
+            current_month += 1
+    elif repeat == 'daily':
+        f = 1
+    elif repeat == 'weekly':
+        f = 7
+    elif repeat == 'biweekly':
+        f = 14
+    while current <= final_date:
+        try:
+            request.db.cursor().execute(ADD_EVENT, [event, current, time, time_end])
+        except psycopg2.Error:
+            break;
+        else:
+            current += datetime.timedelta(f)
 
 
 @view_config(route_name='add', request_method='POST')

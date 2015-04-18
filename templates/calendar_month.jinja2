@@ -42,7 +42,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div>{% endif %}<!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
 
 
@@ -52,7 +52,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div><!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
             <div class="row row_calendar">{% for date in dates[14:21] -%}
             <label for="{{ date }}"><!--
@@ -60,7 +60,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div><!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
             <div class="row row_calendar">{% for date in dates[21:28] -%}
             <label for="{{ date }}"><!--
@@ -68,7 +68,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div><!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
 
             <div class="row row_calendar">{% for date in dates[28:35] -%}
@@ -79,7 +79,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div>{% endif %}<!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
             
             <div class="row row_calendar">{% for date in dates[35:42] -%}
@@ -90,7 +90,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div>{% endif %}<!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
         </form>
 </div>
