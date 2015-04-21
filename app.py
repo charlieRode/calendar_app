@@ -183,19 +183,20 @@ def add_event(request):
             date = datetime.date(int(date_nums[0]), current_month, the_day)
             request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
             current_month += 1
-    elif repeat == 'daily':
-        f = 1
-    elif repeat == 'weekly':
-        f = 7
-    elif repeat == 'biweekly':
-        f = 14
-    while current <= final_date:
-        try:
-            request.db.cursor().execute(ADD_EVENT, [event, current, time, time_end])
-        except psycopg2.Error:
-            break;
-        else:
-            current += datetime.timedelta(f)
+    else:
+        if repeat == 'daily':
+            f = 1
+        elif repeat == 'weekly':
+            f = 7
+        elif repeat == 'biweekly':
+            f = 14
+        while current <= final_date:
+            try:
+                request.db.cursor().execute(ADD_EVENT, [event, current, time, time_end])
+            except psycopg2.Error:
+                break;
+            else:
+                current += datetime.timedelta(f)
 
 
 @view_config(route_name='add', request_method='POST')
