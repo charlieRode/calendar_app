@@ -4,6 +4,7 @@
     <h2 style="color: #337ab7;">{{ readable_date }}</h2>
     <table class="table table-striped">
         {% for event in events %}
+        <h1>{{event[2]}}: {{event[3]}}</h1>
         <tr>
             <td width="30%">{{ event[0] }} - {{ event[1] }}</td>
             <td width="60%">{{ event[2] }}</td>

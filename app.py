@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS days (
 TABLE2_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
     id serial PRIMARY KEY,
+    r_id INTEGER NOT NULL,
     description TEXT NOT NULL,
     date DATE REFERENCES days(date) NOT NULL,
     time TIME NOT NULL,
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS events (
 """
 
 ADD_EVENT = """
-INSERT INTO events (description, date, time, time_end) VALUES (%s, %s, %s, %s)
+INSERT INTO events (r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s)
 """
 
 REMOVE_EVENT = """
@@ -39,7 +40,7 @@ DELETE FROM events WHERE description=%s
 """
 
 RETRIEVE_DAY = """
-SELECT time, time_end, description from events WHERE date=%s ORDER BY time ASC
+SELECT time, time_end, description, r_id from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -123,8 +124,8 @@ def read_date(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2])) for tup in query_result]
-    # For each event in 'events', event[0] is start time, event[1] is end time, event[2] is description
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3]) for tup in query_result]
+    # For each event in 'events', event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id
     return {'date': date, 'readable_date': readable_date, 'events': result}
 
 
@@ -162,8 +163,25 @@ def delete_event_view(request):
     return HTTPFound(route)
 
 
+def get_next_rid(request):
+    request.db.cursor().execute("SELECT NEXTVAL('rid')")
+    return request.db.cursor().fetchall()[0]
+
+
+
 def add_event(request):
     """adds an event to the calendar"""
+
+    repeat_id = get_next_rid(request)
+
+
+    # Above is what is causing trouble. Without any useful error message, my guess is that I am
+    # attempting a GET request within a view function that is explicitly paramaterized to be
+    # POSTing.
+    #
+    # Commenting out the line that defines repeat_id and hard-coding an arbitary int for that
+    # argument runs fine... so I know where to dig... hope that hole isn't too deep.
+
     final_date = datetime.date(datetime.date.today().year, 12, 31)
     repeat = request.params['repeat']
     event = request.params['description']
@@ -175,13 +193,13 @@ def add_event(request):
     if time_end < time:
         raise ValueError('End time must be later than start time')
     if repeat == 'never':
-        request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
+        request.db.cursor().execute(ADD_EVENT, [4, event, date, time, time_end])
     elif repeat == 'monthly':
         the_day = int(date_nums[2])
         current_month = int(date_nums[1])
         while current_month <= 12:
             date = datetime.date(int(date_nums[0]), current_month, the_day)
-            request.db.cursor().execute(ADD_EVENT, [event, date, time, time_end])
+            request.db.cursor().execute(ADD_EVENT, [repeat_id, event, date, time, time_end])
             current_month += 1
     else:
         if repeat == 'daily':
@@ -192,7 +210,7 @@ def add_event(request):
             f = 14
         while current <= final_date:
             try:
-                request.db.cursor().execute(ADD_EVENT, [event, current, time, time_end])
+                request.db.cursor().execute(ADD_EVENT, [repeat_id, event, current, time, time_end])
             except psycopg2.Error:
                 break;
             else:
