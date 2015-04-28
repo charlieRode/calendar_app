@@ -40,7 +40,7 @@ DELETE FROM events WHERE description=%s
 """
 
 RETRIEVE_DAY = """
-SELECT time, time_end, description, r_id from events WHERE date=%s ORDER BY time ASC
+SELECT time, time_end, description, r_id, id from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -124,8 +124,8 @@ def read_date(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3]) for tup in query_result]
-    # For each event in 'events', event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4]) for tup in query_result]
+    # For each event in 'events', event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id, event[4] is id
     return {'date': date, 'readable_date': readable_date, 'events': result}
 
 
@@ -164,24 +164,16 @@ def delete_event_view(request):
 
 
 def get_next_rid(request):
-    request.db.cursor().execute("SELECT NEXTVAL('rid')")
-    return request.db.cursor().fetchall()[0]
-
+    cursor = request.db.cursor()
+    cursor.execute("SELECT NEXTVAL('rid')")
+    results = cursor.fetchone()
+    # results = (####L,)
+    return int(results[0])
 
 
 def add_event(request):
     """adds an event to the calendar"""
-
     repeat_id = get_next_rid(request)
-
-
-    # Above is what is causing trouble. Without any useful error message, my guess is that I am
-    # attempting a GET request within a view function that is explicitly paramaterized to be
-    # POSTing.
-    #
-    # Commenting out the line that defines repeat_id and hard-coding an arbitary int for that
-    # argument runs fine... so I know where to dig... hope that hole isn't too deep.
-
     final_date = datetime.date(datetime.date.today().year, 12, 31)
     repeat = request.params['repeat']
     event = request.params['description']
@@ -193,7 +185,7 @@ def add_event(request):
     if time_end < time:
         raise ValueError('End time must be later than start time')
     if repeat == 'never':
-        request.db.cursor().execute(ADD_EVENT, [4, event, date, time, time_end])
+        request.db.cursor().execute(ADD_EVENT, [repeat_id, event, date, time, time_end])
     elif repeat == 'monthly':
         the_day = int(date_nums[2])
         current_month = int(date_nums[1])
@@ -222,7 +214,7 @@ def add_event_view(request):
     """view function to add an event to the calendar"""
     try:
         add_event(request)
-    except psycopg2.Error:
+    except psycopg2.Error as e:
         return HTTPInternalServerError
     # Since the URL named 'date' requires form information to render,
     # we cannot simply return HTTPFound(request.route_url('date')).

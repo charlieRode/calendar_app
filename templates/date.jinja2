@@ -4,7 +4,6 @@
     <h2 style="color: #337ab7;">{{ readable_date }}</h2>
     <table class="table table-striped">
         {% for event in events %}
-        <h1>{{event[2]}}: {{event[3]}}</h1>
         <tr>
             <td width="30%">{{ event[0] }} - {{ event[1] }}</td>
             <td width="60%">{{ event[2] }}</td>
@@ -12,7 +11,10 @@
                 <form action="{{request.route_url('delete')}}" method="POST">
                     <div class="form-group">
                         <input type="hidden" name="date" value="{{ date }}"/>
-                        <button type="submit" value="{{ event[2] }}" name="description" class="btn btn-default btn-sm">
+                        <!-- <button type="button" value="{{ event[2] }}" name="description" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button> -->
+                        <button type="button" data-toggle="modal" data-target=".del" class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -55,5 +57,22 @@
             </form>
         </div>
     </div>
+
+<div class="modal fade del">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Repeat Event</h5></div>
+        <div class="modal-body">
+            <p>This is a repeating event. Do you want to delete every instance of it?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Yes, delete all instances of this event</button>
+            <button type="submit" class="btn btn-primary">No, just delete this event for today</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
 </aside>
 {% endblock %}
