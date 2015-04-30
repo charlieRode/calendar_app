@@ -25,22 +25,31 @@ TABLE2_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
     id serial PRIMARY KEY,
     r_id INTEGER NOT NULL,
+    repeats BOOLEAN NOT NULL,
     description TEXT NOT NULL,
     date DATE REFERENCES days(date) NOT NULL,
     time TIME NOT NULL,
     time_end TIME NOT NULL)
 """
 
+SEQUECE_SCHEMA = """
+CREATE SEQUENCE rid NO MAXVALUE OWNED BY events.r_id
+"""
+
 ADD_EVENT = """
-INSERT INTO events (r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s)
+INSERT INTO events (repeats, r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s, %s)
 """
 
 REMOVE_EVENT = """
-DELETE FROM events WHERE description=%s
+DELETE FROM events WHERE id=%s
+"""
+
+REMOVE_EACH_EVENT = """
+DELETE FROM events WHERE r_id=%s
 """
 
 RETRIEVE_DAY = """
-SELECT time, time_end, description, r_id, id from events WHERE date=%s ORDER BY time ASC
+SELECT time, time_end, description, r_id, id, repeats from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -124,9 +133,24 @@ def read_date(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4]) for tup in query_result]
-    # For each event in 'events', event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id, event[4] is id
-    return {'date': date, 'readable_date': readable_date, 'events': result}
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4], tup[5]) for tup in query_result]
+
+    class Event(object):
+        def __init__(self, i_d, r_id, repeats, start_time, end_time, description):
+            self.id = i_d
+            self.r_id = r_id
+            self.repeats = repeats
+            self.time = start_time
+            self.time_end = end_time
+            self.description = description
+
+    events = []
+    # For each event in results, event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id, event[4] is id,
+    # event[5] is repeats
+    for event in result:
+        events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2]))
+
+    return {'date': date, 'readable_date': readable_date, 'events': events}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
@@ -138,6 +162,7 @@ def read_day(request):
     cur.execute(RETRIEVE_DAY, [today])
     query_result = cur.fetchall()
     result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2])) for tup in query_result]
+
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render.
 
@@ -146,8 +171,13 @@ def read_day(request):
 
 def delete_event(request):
     """removes an event from the calendar"""
-    event = request.params['description']
-    request.db.cursor().execute(REMOVE_EVENT, [event])
+    del_all = bool(request.params['del_all']) # Apparently I can only pass strings through HTML forms
+    if del_all:
+        event_id = request.params['r_id']
+        request.db.cursor().execute(REMOVE_EACH_EVENT, [event_id])
+    else:
+        event_id = request.params['id']
+        request.db.cursor().execute(REMOVE_EVENT, [event_id])
 
 
 @view_config(route_name='delete', request_method='POST')
@@ -155,7 +185,7 @@ def delete_event_view(request):
     """view function to remove an event from the calendar"""
     try:
         delete_event(request)
-    except psycopg2.Error:
+    except psycopg2.Error as e:
         return HTTPInternalServerError
 
     date = request.params['date']
@@ -184,14 +214,16 @@ def add_event(request):
     current = datetime.date(int(date_nums[0]), int(date_nums[1]), int(date_nums[2]))
     if time_end < time:
         raise ValueError('End time must be later than start time')
+    repeats = 't'
     if repeat == 'never':
-        request.db.cursor().execute(ADD_EVENT, [repeat_id, event, date, time, time_end])
+        repeats = 'f'
+        request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, date, time, time_end])
     elif repeat == 'monthly':
         the_day = int(date_nums[2])
         current_month = int(date_nums[1])
         while current_month <= 12:
             date = datetime.date(int(date_nums[0]), current_month, the_day)
-            request.db.cursor().execute(ADD_EVENT, [repeat_id, event, date, time, time_end])
+            request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, date, time, time_end])
             current_month += 1
     else:
         if repeat == 'daily':
@@ -202,7 +234,7 @@ def add_event(request):
             f = 14
         while current <= final_date:
             try:
-                request.db.cursor().execute(ADD_EVENT, [repeat_id, event, current, time, time_end])
+                request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, current, time, time_end])
             except psycopg2.Error:
                 break;
             else:
@@ -238,6 +270,7 @@ def init_db():
     with closing(connect_db(settings)) as db:
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
+        db.cursor().execute(SEQUECE_SCHEMA)
         db.commit()
 
     def populate_calendar():
