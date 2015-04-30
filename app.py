@@ -122,6 +122,10 @@ def read_calendar_month(request):
     query_result = cur.fetchall()
     # Format results as list of date objects
     dates = [result[0] for result in query_result]
+    if the_month == 1:
+        dow = dates[0].isoweekday() if dates[0].isoweekday() != 7 else 0
+        front = [0] * dow # Shouldn't matter what goes here. Just the length of the list is important.
+        dates = front + dates
     return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
     'prev_month': prev_month, 'next_month': next_month}
 
