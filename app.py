@@ -65,7 +65,7 @@ def convert_to_readable_format(date):
     month = months[month_int - 1]
     day = date.split('-')[2].lstrip('0')
     if day[-1] == '1':
-        day += 'st'
+        day += 'th' if day == '11' else 'st'
     elif day[-1] == '2':
         day += 'nd'
     elif day[-1] == '3':
