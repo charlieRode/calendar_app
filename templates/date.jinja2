@@ -5,26 +5,54 @@
     <table class="table table-striped">
         {% for event in events %}
         <tr>
-            <td width="30%">{{ event[0] }} - {{ event[1] }}</td>
-            <td width="60%">{{ event[2] }}</td>
+            <td width="30%">{{ event.time }} - {{ event.time_end }}</td>
+            <td width="50%">{{ event.description }}</td>
             <td width="10%">
-                <form action="{{request.route_url('delete')}}" method="POST">
+                {% if event.repeats -%}
+                <span style="color: green" class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span>
+                {%- endif %}
+            </td>
+            <td width="10%">
+                <form action="{{request.route_url('delete')}}" method="POST" id="del-{{event.id}}">
                     <div class="form-group">
                         <input type="hidden" name="date" value="{{ date }}"/>
-                        <button type="submit" value="{{ event[2] }}" name="description" class="btn btn-default btn-sm">
+                        <input type="hidden" name="id" value="{{ event.id }}"/>
+                        <input type="hidden" name="r_id" value="{{ event.r_id }}"/>
+                        {% if event.repeats %}
+                        <button type="button" data-toggle="modal" data-target=".del-{{event.id}}" class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
                         </button>
+                        {% else %}
+                        <button type="submit" value="{{ event.id }}" name="del_all" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                        {% endif %}
                     </div>
                 </form>
             </td>
         </tr>
+            <div class="modal fade del-{{event.id}}">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"><h5 class="modal-title">Repeat Event</h5></div>
+                    <div class="modal-body">
+                        <p>This is a repeating event. Do you want to remove all instances from the calendar for the rest of time? Or do you want
+                         to only remove it from this particular day?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" form="del-{{event.id}}" name="del_all" value="1" class="btn btn-primary">All Instances</button>
+                        <button type="submit" form="del-{{event.id}}" name="del_all" value="0" class="btn btn-primary"> Just Today </button>
+                    </div>
+                </div>
+              </div>
+            </div>
         {% endfor %}
     </table>
 </div>
 <aside>
     <div class="container">
         <div class="well">
-            <form action="{{request.route_url('add')}}" method="POST">
+            <form action="{{request.route_url('add')}}" method="POST" id="sub">
                 <input type="hidden" name="date" value="{{ date }}"/>
                 <div class="form-group">
                     <label for="description">Add Event</label>
@@ -37,23 +65,28 @@
                         <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time" id="time"></div>
                         <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time_end" id="time_end"></div>
                         <div class="input-group-btn">
-                        <button type="button" class="btn btn-default">Repeat</button>
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            <span class="caret"></span>
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Never</a></li>
-                            <li><a href="#">Every week</a></li>
-                            <li><a href="#">Every other week</a></li>
-                            <li><a href='#'>Every month</a></li>
-                        </ul>
+                        <div class="btn-group">
+                          <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Repeat <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                              <li><input type="radio" id="never" name="repeat" value="never"><label for="never">Never</label></li>
+                              <li><input type="radio" id="daily" name="repeat" value="daily"><label for="daily">Daily</label></li>
+                              <li><input type="radio" id="weekly" name="repeat" value="weekly"><label for="weekly">Every week</label></li>
+                              <li><input type="radio" id="eoweek" name="repeat" value="biweekly"><label for="eoweek">Every other week</label></li>
+                              <li><input type="radio" id="monthly" name="repeat" value="monthly"><label for="monthly">Every month</label></li>
+                            </ul>
+                        </div>
                         <button type="submit" class="btn btn-default">Submit</button>
                       </div>
                     </div>
                 </div>
             </form>
         </div>
+            <div class="alert alert-warning alert-dismissible collapse" role="alert" id="select_repeat">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+                <strong>You must specify how often this event will repeat</strong>
+            </div>
     </div>
 </aside>
 {% endblock %}

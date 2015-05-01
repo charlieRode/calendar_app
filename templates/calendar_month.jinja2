@@ -1,7 +1,7 @@
 {% extends "base.jinja2" %}
 {% block body %}
 <div class="container">
-    <div class="row vert_center" style="border: 1px solid #337ab7; height: 70px;">
+    <div class="row vert_center" style="border: 1px solid gray; height: 70px;">
         <div class="col-md-3">
             <form action="{{ request.route_url('calendar_month') }}" method="GET">
                 <label class="scroll_left">
@@ -34,7 +34,11 @@
         --><div class="day_of_week">Saturday</div>
     </div>
         <form action="{{ request.route_url('date') }}" method="GET">
-            <div class="row">{% for date in dates[:7] -%}
+            <div class="row">
+            {% for date in dates[:7] -%}
+            {%- if date == 0 -%}
+            <label><div class="day_block diff_month"></div></label>
+            {%- else -%}
             <label for="{{ date }}"><!--
             -->{% if date.month != the_month %}<div class="day_block diff_month">
                     <div class="daynum">{{ date.day }}</div>
@@ -42,8 +46,8 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div>{% endif %}<!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endfor %}</div>
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            {%- endif -%}{%- endfor %}</div>
 
 
             <div class="row row_calendar">{% for date in dates[7:14] -%}
@@ -52,7 +56,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div><!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
             <div class="row row_calendar">{% for date in dates[14:21] -%}
             <label for="{{ date }}"><!--
@@ -60,7 +64,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div><!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
             <div class="row row_calendar">{% for date in dates[21:28] -%}
             <label for="{{ date }}"><!--
@@ -68,7 +72,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div><!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
 
             <div class="row row_calendar">{% for date in dates[28:35] -%}
@@ -79,7 +83,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div>{% endif %}<!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
             
             <div class="row row_calendar">{% for date in dates[35:42] -%}
@@ -90,7 +94,7 @@
                     <div class="daynum">{{ date.day }}</div>
                 </div>{% endif %}<!--
         --></label><!--
-            --><input type="radio" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
             {%- endfor %}</div>
         </form>
 </div>

@@ -20,10 +20,17 @@ var applyPanelClass = function() {
 }   
 
 $(document).ready(function() {
-    $('input[type=radio]').click(function() {
+    $('.radio-button').click(function() {
         $(this).closest("form").submit();
     });
 
     $('div.panel').each(applyPanelClass);
+
+    $('#sub').submit(function() {
+        if (!($('#never').is(':checked') || $('#daily').is(':checked') || $('#weekly').is(':checked') || $('#eoweek').is(':checked') || $('#monthly').is(':checked'))) {
+            $('.alert').show()
+            return false;
+        }
+    });
 
 });
