@@ -6,7 +6,12 @@
         {% for event in events %}
         <tr>
             <td width="30%">{{ event.time }} - {{ event.time_end }}</td>
-            <td width="60%">{{ event.description }}</td>
+            <td width="50%">{{ event.description }}</td>
+            <td width="10%">
+                {% if event.repeats -%}
+                <span style="color: green" class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span>
+                {%- endif %}
+            </td>
             <td width="10%">
                 <form action="{{request.route_url('delete')}}" method="POST" id="del-{{event.id}}">
                     <div class="form-group">
