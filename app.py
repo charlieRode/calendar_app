@@ -9,7 +9,10 @@ from pyramid.session import SignedCookieSessionFactory
 from pyramid.view import view_config
 from pyramid.events import NewRequest, subscriber
 from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
 from waitress import serve
+from cryptacular.bcrypt import BCRYPTPasswordManager
 
 
 # "Use the __file__ global special attribute to get the Python object
@@ -266,6 +269,18 @@ def connect_db(settings):
     return psycopg2.connect(settings['db'])
 
 
+def do_login(request):
+    username = request.params.get('username', None)
+    password = request.params.get('password', None)
+    if not (username and password):
+        raise ValueError('both username and password required')
+    settings = request.registry.settings
+    manager = BCRYPTPasswordManager()
+    if username == os.environ.get('auth.username', ''):
+        hased = settings.get('auth.password', '')
+        return manager.check(hashed, password)
+
+
 def init_db():
     settings = {}
     settings['db'] = os.environ.get(
@@ -329,13 +344,20 @@ def main():
     settings['db'] = os.environ.get(
         'DATABASE_URL', 'dbname=calendar_db user=store'
     )
+    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
+    manager = BCRYPTPasswordManager()
+    settings['auth.password'] = os.environ.get(
+        'AUTH_PASSWORD', manager.encode('sneakysecret'))
     # secret value for session signing:
-    secret = os.environ.get('CALENDAR_SESSION_SECRET', 'secret')
+    secret = os.environ.get('CALENDAR_SESSION_SECRET', 'supersecret')
     session_factory = SignedCookieSessionFactory(secret)
+    auth_secret = os.environ.get('CALENDAR_AUTH_SECRET', 'superdupersecret')
     # configuration setup
     config = Configurator(
         settings=settings,
-        session_factory=session_factory
+        session_factory=session_factory,
+        authentication_policy=AuthTktAuthenticationPolicy(secret=auth_secret, hashalg='sha512'),
+        authorization_policy=ACLAuthorizationPolicy(),
     )
     config.include('pyramid_jinja2')
     config.add_static_view('static', os.path.join(here, 'static'))
