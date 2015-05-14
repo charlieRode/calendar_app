@@ -290,7 +290,7 @@ def login(request):
 @view_config(route_name='logout')
 def logout(request):
     headers = forget(request)
-    return HTTPFound(request.route_url('home'), headers=headers)
+    return HTTPFound(request.route_url('login'), headers=headers)
 
 
 def do_login(request):
