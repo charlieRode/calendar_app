@@ -49,6 +49,7 @@
         {% endfor %}
     </table>
 </div>
+{% if request.authenticated_userid %}
 <aside>
     <div class="container">
         <div class="well">
@@ -89,4 +90,5 @@
             </div>
     </div>
 </aside>
+{% endif %}
 {% endblock %}

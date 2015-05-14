@@ -11,6 +11,7 @@ from pyramid.events import NewRequest, subscriber
 from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.security import remember, forget
 from waitress import serve
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
@@ -269,6 +270,29 @@ def connect_db(settings):
     return psycopg2.connect(settings['db'])
 
 
+@view_config(route_name='login', renderer='templates/login.jinja2')
+def login(request):
+    username = request.params.get('username', '')
+    error = ''
+    if request.method == 'POST':
+        error = 'Login Failed'
+        authenticated = False
+        try:
+            authenticated = do_login(request)
+        except ValueError as e:
+            error = str(e)
+        if authenticated:
+            headers = remember(request, username)
+            return HTTPFound(request.route_url('home'), headers=headers)
+    return {'error': error, 'username': username}
+
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(request.route_url('home'), headers=headers)
+
+
 def do_login(request):
     username = request.params.get('username', None)
     password = request.params.get('password', None)
@@ -276,8 +300,8 @@ def do_login(request):
         raise ValueError('both username and password required')
     settings = request.registry.settings
     manager = BCRYPTPasswordManager()
-    if username == os.environ.get('auth.username', ''):
-        hased = settings.get('auth.password', '')
+    if username == settings.get('auth.username', ''):
+        hashed = settings.get('auth.password', '')
         return manager.check(hashed, password)
 
 
@@ -367,6 +391,8 @@ def main():
     config.add_route('date', '/date')
     config.add_route('calendar', '/calendar')
     config.add_route('calendar_month', '/calendar_month')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
     config.scan()
     app = config.make_wsgi_app()
     return app
