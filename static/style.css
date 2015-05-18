@@ -1,19 +1,12 @@
-.darkBG {
-    background: #999;
-}
-
-.darkerBG {
-    background: #666;
-}
-
-.darkestBG {
-    background: #333;
+.titles {
+    color: #337ab7;
+    font-family: verdana;
 }
 
 .month_title {
     text-align: center;
     font-size: 36px;
-    font-family: inherit;
+    font-family: verdana;
     font-weight: 500;
 }
 
