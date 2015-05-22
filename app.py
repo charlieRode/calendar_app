@@ -3,6 +3,7 @@ import os
 import logging
 import psycopg2
 import datetime
+import pytz
 from contextlib import closing
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
@@ -165,7 +166,8 @@ def read_date(request):
 def read_day(request):
     # We want the main view page to always display today's events
     # This will be for viewing only.
-    today = str(datetime.datetime.today()).split(' ')[0]
+    date = datetime.datetime.now(tz=pytz.timezone('US/Pacific'))
+    today = str(date).split(' ')[0]
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [today])
     query_result = cur.fetchall()
