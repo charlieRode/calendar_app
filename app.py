@@ -137,7 +137,8 @@ def read_calendar_month(request):
 
 @view_config(route_name='date', renderer='templates/date.jinja2')
 def read_date(request):
-    date = str(request.params['date'])
+    date = request.params['date']
+    dow = datetime.datetime(int(date.split('-')[0]), int(date.split('-')[1]), int(date.split('-')[2])).strftime('%A')
     readable_date = convert_to_readable_format(date)
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
@@ -159,7 +160,7 @@ def read_date(request):
     for event in result:
         events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2]))
 
-    return {'date': date, 'readable_date': readable_date, 'events': events}
+    return {'date': date, 'dow': dow, 'readable_date': readable_date, 'events': events}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')

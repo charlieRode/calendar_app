@@ -1,7 +1,7 @@
 {% extends "base.jinja2" %}
 {% block body %}
 <div class="container" style="width: 970px !important;">
-    <h2 class="titles">{{ readable_date }}</h2>
+    <h2 class="titles scroll_left">{{ dow }}</h2> <h2 class="titles scroll_right">{{ readable_date }}</h2>
     <table class="table table-striped">
         {% for event in events %}
         <tr>
