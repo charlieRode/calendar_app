@@ -80,31 +80,6 @@ def convert_to_readable_format(date):
     return '{m} {d}, {y}'.format(y=year, m=month, d=day)
 
 
-@view_config(route_name='calendar', renderer='templates/calendar.jinja2')
-def read_calendar(request):
-
-    class Month(object):
-        def __init__(self, name, num):
-            self.name = name
-            self.num = num
-
-    January = Month("January", 1)
-    February = Month("February", 2)
-    March = Month("March", 3)
-    April = Month("April", 4)
-    May = Month("May", 5)
-    June = Month("June", 6)
-    July = Month("July", 7)
-    August = Month("August", 8)
-    September = Month("September", 9)
-    October = Month("October", 10)
-    November = Month("November", 11)
-    December = Month("December", 12)
-
-    calendar = [January, February, March, April, May, June, July, August, September, October, November, December]
-    return {'calendar': calendar}
-
-
 @view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
 def read_calendar_month(request):
     the_month = int(request.params['month'])
@@ -392,7 +367,6 @@ def main():
     config.add_route('add', '/add')
     config.add_route('delete', '/delete')
     config.add_route('date', '/date')
-    config.add_route('calendar', '/calendar')
     config.add_route('calendar_month', '/calendar_month')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
