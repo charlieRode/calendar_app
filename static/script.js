@@ -17,7 +17,7 @@ var applyPanelClass = function() {
     else if (date >= startTime) {
         $(this).switchClass('panel-success', 'panel-warning');
     }
-}   
+}
 
 $(document).ready(function() {
     $('.radio-button').click(function() {

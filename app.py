@@ -37,6 +37,14 @@ CREATE TABLE IF NOT EXISTS events (
     time_end TIME NOT NULL)
 """
 
+TABLE3_SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    id serial PRIMARY KEY,
+    username text NOT NULL,
+    password text NOT NULL,
+    email text NOT NULL)
+"""
+
 SEQUECE_SCHEMA = """
 CREATE SEQUENCE rid NO MAXVALUE OWNED BY events.r_id
 """
@@ -248,6 +256,28 @@ def connect_db(settings):
     return psycopg2.connect(settings['db'])
 
 
+@view_config(route_name='register', renderer='templates/register.jinja2')
+def register(request):
+    return {}
+
+
+@view_config(route_name='register_view', request_method='POST')
+def register_view(request):
+    try:
+        register_user(request)
+    except psycopg2.Error as e:
+        return HTTPInternalServerError
+    return HTTPFound(request.route_url('login'))
+
+
+def register_user(request):
+    username = request.params['username']
+    password = request.params['password']
+    email = request.params['email']
+    request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, password, email])
+    return
+
+
 @view_config(route_name='login', renderer='templates/login.jinja2')
 def login(request):
     username = request.params.get('username', '')
@@ -292,6 +322,7 @@ def init_db():
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
         db.cursor().execute(SEQUECE_SCHEMA)
+        db.cursor().execute(TABLE3_SCHEMA)
         db.commit()
 
     def populate_calendar():
@@ -370,6 +401,8 @@ def main():
     config.add_route('calendar_month', '/calendar_month')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('register', '/register')
+    config.add_route('register_view', '/register_view')
     config.scan()
     app = config.make_wsgi_app()
     return app
