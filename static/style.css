@@ -1,6 +1,7 @@
 .titles {
     color: #337ab7;
     font-family: verdana;
+    display: inline-block;
 }
 
 .month_title {

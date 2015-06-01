@@ -176,7 +176,7 @@ def read_day(request):
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render.
 
-    return {'today': convert_to_readable_format(today), 'events': result}
+    return {'date': date, 'today': convert_to_readable_format(today), 'events': result}
 
 
 def delete_event(request):
