@@ -274,7 +274,8 @@ def register_user(request):
     username = request.params['username']
     password = request.params['password']
     email = request.params['email']
-    request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, password, email])
+    hashed_pass = BCRYPTPasswordManager().encode(password)
+    request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hased_pass, email])
     return
 
 
