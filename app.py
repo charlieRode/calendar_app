@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS events (
 TABLE3_SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
     id serial PRIMARY KEY,
-    username text NOT NULL,
+    username text NOT NULL UNIQUE,
     password text NOT NULL,
     email text NOT NULL)
 """
@@ -306,11 +306,14 @@ def do_login(request):
     password = request.params.get('password', None)
     if not (username and password):
         raise ValueError('both username and password required')
-    settings = request.registry.settings
     manager = BCRYPTPasswordManager()
-    if username == settings.get('auth.username', ''):
-        hashed = settings.get('auth.password', '')
-        return manager.check(hashed, password)
+    cur = request.db.cursor()
+    try:
+        cur.execute("SELECT password FROM users WHERE username=%s", [username])
+    except psycopg2.Error:
+        raise ValueError("That username already exists!")
+    actual_password = cur.fetchall()
+    return manager.check(actual_password, password)
 
 
 def init_db():
