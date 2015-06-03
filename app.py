@@ -13,6 +13,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
+from pyramid.security import authenticated_userid
+from pyramid.request import Request
 from waitress import serve
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
@@ -275,8 +277,16 @@ def register_user(request):
     password = request.params['password']
     email = request.params['email']
     hashed_pass = BCRYPTPasswordManager().encode(password)
-    request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hased_pass, email])
+    request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hashed_pass, email])
     return
+
+
+@view_config(route_name='test_space', renderer='templates/test_space.jinja2')
+def test_view(request):
+    headers = request.headers
+    req_userid = request.authenticated_userid
+    sec_userid = authenticated_userid(request)
+    return {'headers':headers, 'req_userid':req_userid, 'sec_userid': sec_userid}
 
 
 @view_config(route_name='login', renderer='templates/login.jinja2')
@@ -313,7 +323,7 @@ def do_login(request):
         cur.execute("SELECT password FROM users WHERE username=%s", [username])
     except psycopg2.Error:
         raise ValueError("That username already exists!")
-    actual_password = cur.fetchall()
+    actual_password = cur.fetchall()[0][0]  # Extrrrract the data
     return manager.check(actual_password, password)
 
 
@@ -407,6 +417,7 @@ def main():
     config.add_route('logout', '/logout')
     config.add_route('register', '/register')
     config.add_route('register_view', '/register_view')
+    config.add_route('test_space', '/test_space')
     config.scan()
     app = config.make_wsgi_app()
     return app
