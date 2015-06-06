@@ -273,11 +273,17 @@ def register_view(request):
 
 
 def register_user(request):
-    username = request.params['username']
-    password = request.params['password']
+    username = request.params.get('username', '')
+    password = request.params.get('password', '')
+    password_again = request.params.get('password_again', '')
     email = request.params['email']
     hashed_pass = BCRYPTPasswordManager().encode(password)
-    request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hashed_pass, email])
+    if password != password_again:
+        raise ValueError("Passwords don't match")
+    try:
+        request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hashed_pass, email])
+    except psycopg2.Error as e:
+        raise ValueError("That username already exists!")
     return
 
 
@@ -319,11 +325,11 @@ def do_login(request):
         raise ValueError('both username and password required')
     manager = BCRYPTPasswordManager()
     cur = request.db.cursor()
+    cur.execute("SELECT password FROM users WHERE username=%s", [username])
     try:
-        cur.execute("SELECT password FROM users WHERE username=%s", [username])
-    except psycopg2.Error:
-        raise ValueError("That username already exists!")
-    actual_password = cur.fetchall()[0][0]  # Extrrrract the data
+        actual_password = cur.fetchall()[0][0]  # Extrrrract the data
+    except IndexError:  # Given username couldn't be found
+        return False
     return manager.check(actual_password, password)
 
 
