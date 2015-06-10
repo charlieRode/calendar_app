@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS days (
     date DATE PRIMARY KEY,
     dow SMALLINT NOT NULL)
 """
-TABLE2_SCHEMA = """
+TABLE3_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
     id serial PRIMARY KEY,
     r_id INTEGER NOT NULL,
@@ -36,10 +36,11 @@ CREATE TABLE IF NOT EXISTS events (
     description TEXT NOT NULL,
     date DATE REFERENCES days(date) NOT NULL,
     time TIME NOT NULL,
-    time_end TIME NOT NULL)
+    time_end TIME NOT NULL,
+    username TEXT REFERENCES users(username) NOT NULL)
 """
 
-TABLE3_SCHEMA = """
+TABLE2_SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
     id serial PRIMARY KEY,
     username text NOT NULL UNIQUE,
@@ -52,7 +53,7 @@ CREATE SEQUENCE rid NO MAXVALUE OWNED BY events.r_id
 """
 
 ADD_EVENT = """
-INSERT INTO events (repeats, r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s, %s)
+INSERT INTO events (username, repeats, r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
 
 REMOVE_EVENT = """
@@ -64,7 +65,7 @@ DELETE FROM events WHERE r_id=%s
 """
 
 RETRIEVE_DAY = """
-SELECT time, time_end, description, r_id, id, repeats from events WHERE date=%s ORDER BY time ASC
+SELECT time, time_end, description, r_id, id, repeats, username from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -128,22 +129,23 @@ def read_date(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4], tup[5]) for tup in query_result]
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4], tup[5], tup[6]) for tup in query_result]
 
     class Event(object):
-        def __init__(self, i_d, r_id, repeats, start_time, end_time, description):
+        def __init__(self, i_d, r_id, repeats, start_time, end_time, description, username):
             self.id = i_d
             self.r_id = r_id
             self.repeats = repeats
             self.time = start_time
             self.time_end = end_time
             self.description = description
+            self.username = username
 
     events = []
     # For each event in results, event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id, event[4] is id,
-    # event[5] is repeats
+    # event[5] is repeats, event[6] is username
     for event in result:
-        events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2]))
+        events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2], event[6]))
 
     return {'date': date, 'dow': dow, 'readable_date': readable_date, 'events': events}
 
@@ -199,6 +201,7 @@ def get_next_rid(request):
 
 def add_event(request):
     """adds an event to the calendar"""
+    user = request.authenticated_userid
     repeat_id = get_next_rid(request)
     final_date = datetime.date(datetime.date.today().year, 12, 31)
     repeat = request.params['repeat']
@@ -213,13 +216,13 @@ def add_event(request):
     repeats = 't'
     if repeat == 'never':
         repeats = 'f'
-        request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, date, time, time_end])
+        request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, date, time, time_end])
     elif repeat == 'monthly':
         the_day = int(date_nums[2])
         current_month = int(date_nums[1])
         while current_month <= 12:
             date = datetime.date(int(date_nums[0]), current_month, the_day)
-            request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, date, time, time_end])
+            request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, date, time, time_end])
             current_month += 1
     else:
         if repeat == 'daily':
@@ -230,7 +233,7 @@ def add_event(request):
             f = 14
         while current <= final_date:
             try:
-                request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, current, time, time_end])
+                request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, current, time, time_end])
             except psycopg2.Error:
                 break;
             else:
@@ -341,8 +344,8 @@ def init_db():
     with closing(connect_db(settings)) as db:
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
-        db.cursor().execute(SEQUECE_SCHEMA)
         db.cursor().execute(TABLE3_SCHEMA)
+        db.cursor().execute(SEQUECE_SCHEMA)
         db.commit()
 
     def populate_calendar():

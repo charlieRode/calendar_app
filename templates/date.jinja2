@@ -5,14 +5,20 @@
     <table class="table table-striped">
         {% for event in events %}
         <tr>
-            <td width="30%">{{ event.time }} - {{ event.time_end }}</td>
+            <td width="25%">{{ event.time }} - {{ event.time_end }}</td>
             <td width="50%">{{ event.description }}</td>
+            {%- if event.username == request.authenticated_userid -%}
+            <td width="10%"><span class="username" style="color: #337ab7"><em>{{ event.username }}</em></span></td>
+            {%- else -%}
+            <td width="10%"><span class="username"><em>{{ event.username }}</em></span></td>
+            {%- endif %}
             <td width="10%">
                 {% if event.repeats -%}
                 <span style="color: green" class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span>
                 {%- endif %}
             </td>
-            <td width="10%">
+            {%- if event.username == request.authenticated_userid -%}
+            <td width="5%">
                 <form action="{{request.route_url('delete')}}" method="POST" id="del-{{event.id}}">
                     <div class="form-group">
                         <input type="hidden" name="date" value="{{ date }}"/>
@@ -30,6 +36,9 @@
                     </div>
                 </form>
             </td>
+            {%- else -%}
+            <td width="5%"></td>
+            {%- endif %}
         </tr>
             <div class="modal fade del-{{event.id}}">
               <div class="modal-dialog">
