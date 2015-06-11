@@ -19,6 +19,7 @@ var applyPanelClass = function() {
     }
 }
 
+
 $(document).ready(function() {
     $('.radio-button').click(function() {
         $(this).closest("form").submit();
@@ -33,4 +34,35 @@ $(document).ready(function() {
         }
     });
 
+    $('.date_block').click(function(){
+        var date_id = $(this).attr('id');
+        var f = document.createElement("form");
+        f.setAttribute('method', "get");
+        f.setAttribute('action', "/date");
+
+        var i = document.createElement("input");
+        i.setAttribute('name', "date");
+        i.setAttribute('value', date_id);
+
+        f.appendChild(i);
+        
+        if (date_id != 0) {
+            f.submit();
+        }
+        
+    });
+
+
+    $('.toggle_month').click(function(){
+        var the_month = $(this).attr('id');
+        var f = document.createElement("form");
+        f.setAttribute('method', "get");
+        f.setAttribute('action', "/calendar");
+        var i = document.createElement("input");
+        i.setAttribute('name', "month");
+        i.setAttribute('value', the_month);
+        f.appendChild(i);
+        f.submit();
+
+    });
 });

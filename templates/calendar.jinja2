@@ -1,7 +1,42 @@
 {% extends "base.jinja2" %}
 {% block body %}
-<div class="container">
-    <div class="table">
+    <div class="container" id="calendar-container">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="{{ prev_month }}" class="toggle_month scroll_left vert_center" style="height: 50px; padding-left: 5px;">
+                    <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <span class="month_title" id="calendar-month-year">{{ month_name }}</span>
+            </div>
+            <div class="col-md-3">
+                <div id="{{ next_month }}" class="toggle_month scroll_right vert_center" style="height: 50px; padding-right: 5px;">
+                    <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+        <div id="calendar-dates">
+            <table>
+                <tbody id="calendar-table">
+                    <tr>
+                        {% for day in ['S', 'M', 'T', 'W', 'T', 'F', 'S'] %}
+                        <td style="height: 40px !important; border: none !important;">{{ day }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% for week in range(6) %}
+                    <tr>
+                        {% for date in dates[0 + (week * 7) : 7 + (week * 7)] %}
+                        {% if date.month != the_month %}
+                            <td id="{{ date }}" class="diff_month date_block">{{ date.day }}</td>
+                        {% else %}
+                            <td id="{{ date }}" class="date_block">{{ date.day }}</td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 {% endblock %}

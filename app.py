@@ -289,9 +289,6 @@ def add_event_view(request):
     return HTTPFound(route)
 
 
-@view_config(route_name=)
-
-
 def connect_db(settings):
     return psycopg2.connect(settings['db'])
 

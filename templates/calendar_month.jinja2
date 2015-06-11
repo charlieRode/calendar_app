@@ -33,7 +33,7 @@
         --><div class="day_of_week">Fri</div><!--
         --><div class="day_of_week">Sat</div>
     </div>
-    <form action="{{ request.route_url('date') }}" method="GET">
+    <form action="/date" method="GET">
         <div class="row">
         {% for date in dates[:7] -%}
         {%- if date == 0 -%}
