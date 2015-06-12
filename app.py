@@ -148,6 +148,10 @@ def read_calendar(request):
         dow = dates[0].isoweekday() if dates[0].isoweekday() != 7 else 0
         front = [0] * dow # Shouldn't matter what goes here. Just the length of the list is important.
         dates = front + dates
+    elif the_month == 12:
+        dow = 7 - (dates[-1].isoweekday() + 1)
+        tail = [0] * dow
+        dates = dates + tail
     return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
     'prev_month': prev_month, 'next_month': next_month}
 
