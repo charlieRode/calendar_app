@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-3">
                 <div id="{{ prev_month }}" class="toggle_month scroll_left vert_center" style="height: 50px; padding-left: 5px;">
-                    <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-menu-left menu" aria-hidden="true"></span>
                 </div>
             </div>
             <div class="col-md-6">
@@ -12,7 +12,7 @@
             </div>
             <div class="col-md-3">
                 <div id="{{ next_month }}" class="toggle_month scroll_right vert_center" style="height: 50px; padding-right: 5px;">
-                    <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-menu-right menu" aria-hidden="true"></span>
                 </div>
             </div>
         </div>
@@ -26,13 +26,15 @@
                     </tr>
                     {% for week in range(6) %}
                     <tr>
-                        {% for date in dates[0 + (week * 7) : 7 + (week * 7)] %}
-                        {% if date.month != the_month %}
-                            <td id="{{ date }}" class="diff_month date_block"><div class="nums">{{ date.day }}</div>
-                                <div class="blips"></div>
+                        {% for day in days[0 + (week * 7) : 7 + (week * 7)] %}
+                        {% if day.date.month != the_month %}
+                            <td id="{{ day.date }}" class="diff_month date_block"><div class="nums">{{ day.date.day }}</div>
+                                <div class="blips">{% for n in range(day.num_events) -%}<span class="glyphicon glyphicon-one-fine-dot"></span>{%- endfor %}</div>
                             </td>
                         {% else %}
-                            <td id="{{ date }}" class="date_block">{{ date.day }}</td>
+                            <td id="{{ day.date }}" class="date_block"><div class="nums">{{ day.date.day }}</div>
+                                <div class="blips">{% for n in range(day.num_events) -%}<span class="glyphicon glyphicon-one-fine-dot"></span>{%- endfor %}</div>
+                            </td>
                         {% endif %}
                         {% endfor %}
                     </tr>

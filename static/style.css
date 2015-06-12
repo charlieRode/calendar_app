@@ -4,7 +4,6 @@
     text-align: center;
     font-size: 16px;
     font-family: Arial;
-    background-image: linear-gradiant(#FFF, #D3D3D3);
 }
 
 #calendar-container>div {
@@ -27,7 +26,7 @@
 }
 
 
-span.glyphicon {
+span.glyphicon.menu {
     font-size: 2em;
 }
 
@@ -105,11 +104,18 @@ span.glyphicon {
 }
 
 .blips {
-    border: 1px solid red;
-    width: 20%;
-    height: 100%;
+    width: 10px;
+    height: 100px;
     float: right;
     transform: translateY(-15%);
+    z-index: 5;
+    margin-top: -24px;
+}
+
+.blips>span {
+    vertical-align: top;
+    position: relative;
+    right: -3px;
 }
 
 .nums {
@@ -118,3 +124,16 @@ span.glyphicon {
     top: 50%;
     transform: translateY(-50%);
 }
+
+.glyphicon.glyphicon-one-fine-dot {
+    margin-bottom: -.8em;
+    overflow: hidden;
+}
+
+.glyphicon.glyphicon-one-fine-dot:before {
+    content: "\25cf";
+    font-size: 1em;
+    color: #337ab7;
+    display: block;
+}
+

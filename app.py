@@ -141,19 +141,31 @@ def read_calendar(request):
     # Grab the first Sunday on or before the 1st of the month:
     first_sunday = first_of_month - datetime.timedelta(dow)
     last_saturday = first_sunday + datetime.timedelta(41)
-    cur.execute("SELECT date FROM days WHERE date >= %s AND date <= %s", [first_sunday, last_saturday])
+    cur.execute("SELECT date, num_events FROM days WHERE date >= %s AND date <= %s ORDER BY date ASC", [first_sunday, last_saturday])
     query_result = cur.fetchall()
-    # Format results as list of date objects
-    dates = [result[0] for result in query_result]
+    
+    class Day(object):
+        def __init__(self, date, num_events):
+            self.date = date
+            self.num_events = min(num_events, 6)  # I can't figure out how to do this in the template. But I'm sure that's where it should be done.
+
+
+    dates = []
+    for result in query_result:
+        dates.append(Day(result[0], result[1]))
+
+
+
     if the_month == 1:
-        dow = dates[0].isoweekday() if dates[0].isoweekday() != 7 else 0
-        front = [0] * dow # Shouldn't matter what goes here. Just the length of the list is important.
+        dow = dates[0].date.isoweekday() if dates[0].date.isoweekday() != 7 else 0
+        front = [Day(0, 0)] * dow # Shouldn't matter what goes here. Just the length of the list is important.
         dates = front + dates
     elif the_month == 12:
-        dow = 7 - (dates[-1].isoweekday() + 1)
-        tail = [0] * dow
+        dow = 7 - (dates[-1].date.isoweekday() + 1)
+        tail = [Day(0, 0)] * dow
         dates = dates + tail
-    return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
+
+    return {'days': dates, 'month_name': month_name, 'the_month': the_month,
     'prev_month': prev_month, 'next_month': next_month}
 
 
@@ -206,13 +218,21 @@ def read_day(request):
 
 def delete_event(request):
     """removes an event from the calendar"""
-    del_all = bool(request.params['del_all']) # Apparently I can only pass strings through HTML forms
+    del_all = bool(request.params.get('del_all', None)) # Apparently I can only pass strings through HTML forms
+    cur = request.db.cursor()
     if del_all:
-        event_id = request.params['r_id']
-        request.db.cursor().execute(REMOVE_EACH_EVENT, [event_id])
+        event_id = request.params.get('r_id', None)
+        cur.execute("SELECT date FROM events WHERE r_id=%s", [event_id])
+        query_result = cur.fetchall()
+        cur.execute(REMOVE_EACH_EVENT, [event_id])
     else:
-        event_id = request.params['id']
-        request.db.cursor().execute(REMOVE_EVENT, [event_id])
+        event_id = request.params.get('id', None)
+        cur.execute("SELECT date FROM events WHERE id=%s", [event_id])
+        query_result = cur.fetchall()
+        cur.execute(REMOVE_EVENT, [event_id])
+
+    dates = tuple([result[0] for result in query_result])
+    request.db.cursor().execute("UPDATE days SET num_events = num_events - 1 WHERE date in %s", [dates])
 
 
 @view_config(route_name='delete', request_method='POST')
