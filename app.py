@@ -89,7 +89,7 @@ def convert_to_readable_format(date):
         day += 'rd'
     else:
         day += 'th'
-    return '{m} {d}, {y}'.format(y=year, m=month, d=day)
+    return '{m} {d}* {y}'.format(y=year, m=month, d=day)
 
 
 @view_config(route_name='calendar', renderer='templates/calendar.jinja2')
@@ -141,8 +141,15 @@ def read_calendar(request):
 
 @view_config(route_name='date', renderer='templates/date.jinja2')
 def read_date(request):
-    date = request.params['date']
-    dow = datetime.datetime(int(date.split('-')[0]), int(date.split('-')[1]), int(date.split('-')[2])).strftime('%A')
+    date = request.params.get('date', None)
+    date_obj = datetime.date(int(date.split('-')[0]), int(date.split('-')[1]), int(date.split('-')[2]))
+    tomorrow = date_obj + datetime.timedelta(1)
+    if tomorrow.year != datetime.date.today().year:
+        tomorrow = datetime.date(datetime.date.today().year, tomorrow.month, tomorrow.day)
+    yesterday = date_obj + datetime.timedelta(-1)
+    if yesterday.year != datetime.date.today().year:
+        yesterday = datetime.date(datetime.date.today().year, yesterday.month, yesterday.day)
+    dow = date_obj.strftime('%A')
     readable_date = convert_to_readable_format(date)
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
@@ -165,7 +172,7 @@ def read_date(request):
     for event in result:
         events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2], event[6]))
 
-    return {'date': date, 'dow': dow, 'readable_date': readable_date, 'events': events}
+    return {'date': date, 'dow': dow, 'readable_date': readable_date, 'events': events, 'yesterday': yesterday, 'tomorrow': tomorrow}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')

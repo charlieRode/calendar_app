@@ -1,12 +1,26 @@
 {% extends "base.jinja2" %}
 {% block body %}
 <div class="container" style="width: 970px !important;">
-    <h2 class="titles scroll_left">{{ dow }}</h2> <h2 class="titles scroll_right">{{ readable_date }}</h2>
+    <div class="row vert_center">
+        <div class="col-md-1">
+            <div id="{{ yesterday }}" class="toggle_day scroll_left vert_center" style="height: 50px; padding-left: 5px;">
+                <span class="glyphicon glyphicon-menu-left menu" aria-hidden="true"></span>
+            </div>
+        </div>
+        <div class="col-md-10" style="margin-bottom: 5px; text-align: center;">
+            <h2 class="titles">{{ dow }}, &nbsp; {{ readable_date | replace("*", ("&nbsp;"|safe)) }}</h2>
+        </div>
+        <div class="col-md-1">
+            <div id="{{ tomorrow }}" class="toggle_day scroll_right vert_center" style="height: 50px; padding-right: 5px;">
+                <span class="glyphicon glyphicon-menu-right menu" aria-hidden="true"></span>
+            </div>
+        </div>
+    </div>
     <table class="table table-striped">
         {% for event in events %}
         <tr>
             <td width="25%">{{ event.time }} - {{ event.time_end }}</td>
-            <td width="43%">{{ event.description }}</td>
+            <td width="43%">{{ event.description | e }}</td>
             <td width="7%">
                 {% if event.repeats -%}
                 <span style="color: green" class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span>

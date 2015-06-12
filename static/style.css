@@ -33,14 +33,14 @@ span.glyphicon.menu {
 
 .titles {
     color: #337ab7;
-    font-family: verdana;
+    font-family: Arial;
     display: inline-block;
 }
 
 .month_title {
     text-align: center;
     font-size: 36px;
-    font-family: verdana;
+    font-family: Arial;
     font-weight: 500;
 }
 
@@ -100,7 +100,7 @@ span.glyphicon.menu {
 }
 
 .username {
-    font-family: verdana;
+    font-family: Arial;
 }
 
 .blips {

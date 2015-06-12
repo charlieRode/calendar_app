@@ -2,7 +2,7 @@
 {% block body %}
 <div class="container" style="width: 970px !important;">
     <div class="row">
-        <h2 class="scroll_right" style="font-family: verdana; margin-top: 40px">{{ today }}</h2><h2 class="titles scroll_left" style="margin-top: 40px">{{ date.strftime('%A') }}</h2>
+        <h2 class="scroll_right" style="font-family: Arial; margin-top: 40px">{{ today | replace("*", ("&nbsp;"|safe)) }}</h2><h2 class="titles scroll_left" style="margin-top: 40px">{{ date.strftime('%A') }}</h2>
     </div>
     {% for event in events %}
     <div class="row">

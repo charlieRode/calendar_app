@@ -65,4 +65,16 @@ $(document).ready(function() {
         f.submit();
 
     });
+
+    $('.toggle_day').click(function(){
+        var the_day = $(this).attr('id');
+        var f = document.createElement("form");
+        f.setAttribute('method', "get");
+        f.setAttribute('action', "/date");
+        var i = document.createElement("input");
+        i.setAttribute('name', "date");
+        i.setAttribute('value', the_day)
+        f.appendChild(i);
+        f.submit();
+    })
 });
