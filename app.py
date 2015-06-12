@@ -92,37 +92,6 @@ def convert_to_readable_format(date):
     return '{m} {d}, {y}'.format(y=year, m=month, d=day)
 
 
-@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
-def read_calendar_month(request):
-    the_month = int(request.params['month'])
-    prev_month = 12 if the_month == 1 else the_month - 1
-    next_month = 1 if the_month == 12 else the_month + 1
-    # Need to get the year from request.params too
-    # For now, this year:
-    the_year = datetime.date.today().year
-    first_of_month = datetime.date(the_year, the_month, 1)
-    # Grab the strfied month:
-    month_name = first_of_month.strftime('%B')
-    cur = request.db.cursor()
-    cur.execute("SELECT dow FROM days WHERE date=%s", [first_of_month])
-    query_result = cur.fetchall()
-    dow = query_result[0][0]
-    # Grab the first Sunday on or before the 1st of the month:
-    first_sunday = first_of_month - datetime.timedelta(dow)
-    last_saturday = first_sunday + datetime.timedelta(41)
-    cur.execute("SELECT date FROM days WHERE date >= %s AND date <= %s", [first_sunday, last_saturday])
-    query_result = cur.fetchall()
-    # Format results as list of date objects
-    dates = [result[0] for result in query_result]
-    if the_month == 1:
-        dow = dates[0].isoweekday() if dates[0].isoweekday() != 7 else 0
-        front = [0] * dow # Shouldn't matter what goes here. Just the length of the list is important.
-        dates = front + dates
-    return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
-    'prev_month': prev_month, 'next_month': next_month}
-
-
-
 @view_config(route_name='calendar', renderer='templates/calendar.jinja2')
 def read_calendar(request):
     the_month = int(request.params['month'])
@@ -350,14 +319,6 @@ def register_user(request):
     return
 
 
-@view_config(route_name='test_space', renderer='templates/test_space.jinja2')
-def test_view(request):
-    headers = request.headers
-    req_userid = request.authenticated_userid
-    sec_userid = authenticated_userid(request)
-    return {'headers':headers, 'req_userid':req_userid, 'sec_userid': sec_userid}
-
-
 @view_config(route_name='login', renderer='templates/login.jinja2')
 def login(request):
     username = request.params.get('username', '')
@@ -481,13 +442,11 @@ def main():
     config.add_route('add', '/add')
     config.add_route('delete', '/delete')
     config.add_route('date', '/date')
-    config.add_route('calendar_month', '/calendar_month')
     config.add_route('calendar', '/calendar')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('register', '/register')
     config.add_route('register_view', '/register_view')
-    config.add_route('test_space', '/test_space')
     config.scan()
     app = config.make_wsgi_app()
     return app
