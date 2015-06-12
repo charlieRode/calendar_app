@@ -89,6 +89,11 @@ span.glyphicon {
 
 .diff_month {
     background-color: #F4F4F4;
+
+}
+
+.same_month {
+
 }
 
 .pastEvent, .pastEvent.panel-title {
@@ -99,3 +104,17 @@ span.glyphicon {
     font-family: verdana;
 }
 
+.blips {
+    border: 1px solid red;
+    width: 20%;
+    height: 100%;
+    float: right;
+    transform: translateY(-15%);
+}
+
+.nums {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}

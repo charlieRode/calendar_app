@@ -28,7 +28,9 @@
                     <tr>
                         {% for date in dates[0 + (week * 7) : 7 + (week * 7)] %}
                         {% if date.month != the_month %}
-                            <td id="{{ date }}" class="diff_month date_block">{{ date.day }}</td>
+                            <td id="{{ date }}" class="diff_month date_block"><div class="nums">{{ date.day }}</div>
+                                <div class="blips"></div>
+                            </td>
                         {% else %}
                             <td id="{{ date }}" class="date_block">{{ date.day }}</td>
                         {% endif %}

@@ -26,7 +26,8 @@ here = os.path.dirname(os.path.abspath(__file__))
 TABLE1_SCHEMA = """
 CREATE TABLE IF NOT EXISTS days (
     date DATE PRIMARY KEY,
-    dow SMALLINT NOT NULL)
+    dow SMALLINT NOT NULL,
+    num_events SMALLINT NOT NULL)
 """
 TABLE3_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
@@ -253,12 +254,14 @@ def add_event(request):
     if repeat == 'never':
         repeats = 'f'
         request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, date, time, time_end])
+        request.db.cursor().execute("UPDATE days SET num_events = num_events + 1 WHERE date=%s", [date])
     elif repeat == 'monthly':
         the_day = int(date_nums[2])
         current_month = int(date_nums[1])
         while current_month <= 12:
             date = datetime.date(int(date_nums[0]), current_month, the_day)
             request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, date, time, time_end])
+            request.db.cursor().execute("UPDATE days SET num_events = num_events + 1 WHERE date=%s", [date])
             current_month += 1
     else:
         if repeat == 'daily':
@@ -270,6 +273,7 @@ def add_event(request):
         while current <= final_date:
             try:
                 request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, current, time, time_end])
+                request.db.cursor().execute("UPDATE days SET num_events = num_events + 1 WHERE date=%s", [current])
             except psycopg2.Error:
                 break;
             else:
@@ -386,7 +390,7 @@ def init_db():
 
     def populate_calendar():
         INSERT_DAY = """
-        INSERT INTO days (date, dow) VALUES (%s, %s)
+        INSERT INTO days (date, dow, num_events) VALUES (%s, %s, %s)
         """
         # I am starting the database on Jan 1st of the current year.
         # I will need to update this for the next year if this project turns out.
@@ -394,7 +398,7 @@ def init_db():
         dow = (date.weekday() + 1) % 7  # <- Sunday: 0, Monday : 1, ..., Saturday: 6
         with closing(connect_db(settings)) as db:
             for i in xrange(365):
-                db.cursor().execute(INSERT_DAY, [date, dow])
+                db.cursor().execute(INSERT_DAY, [date, dow, 0])
                 date += datetime.timedelta(1)
                 dow = (date.weekday() + 1) % 7
             db.commit()
