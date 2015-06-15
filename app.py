@@ -240,11 +240,11 @@ def add_event(request):
     repeat = request.params['repeat']
     event = request.params['description']
     date = request.params['date']
-    time = request.params['time']
-    time_end = request.params['time_end']
+    time = datetime.datetime.strptime(request.params['time'], '%I:%M %p').time()
+    time_end = datetime.datetime.strptime(request.params['time_end'], '%I:%M %p').time()
     date_nums = date.split('-')
     current = datetime.date(int(date_nums[0]), int(date_nums[1]), int(date_nums[2]))
-    if time_end < time:
+    if (time_end < time):
         raise ValueError('End time must be later than start time')
     repeats = 't'
     if repeat == 'never':

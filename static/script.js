@@ -21,18 +21,21 @@ var applyPanelClass = function() {
 
 
 $(document).ready(function() {
-    $('.radio-button').click(function() {
-        $(this).closest("form").submit();
-    });
-
     $('div.panel').each(applyPanelClass);
 
     $('#sub').submit(function() {
         if (!($('#never').is(':checked') || $('#daily').is(':checked') || $('#weekly').is(':checked') || $('#eoweek').is(':checked') || $('#monthly').is(':checked'))) {
-            $('.alert').show()
+            $('#alert_1').show()
             return false;
         }
     });
+
+    $('#sub').submit(function() {
+        var t1 = $('#time').val();
+        var t2 = $('#time_end').val();
+        
+
+    })
 
     $('.date_block').click(function(){
         var date_id = $(this).attr('id');
@@ -76,5 +79,5 @@ $(document).ready(function() {
         i.setAttribute('value', the_day)
         f.appendChild(i);
         f.submit();
-    })
+    });
 });

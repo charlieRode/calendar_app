@@ -85,18 +85,25 @@
                 <div class="form-group">
                     <div class="input-group">
                         <!-- Button and dropdown menu -->
-                        <label for="time">Start Time - End Time</label>
-                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time" id="time"></div>
-                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time_end" id="time_end"></div>
+                        <div class="col-md-3" style="padding:0;">
+                            <label for="time">Start Time</label>
+                            <div class="bfh-timepicker timepicker" data-mode="12h" data-time="12:00 PM" data-name="time" id="time"></div>
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-3" style="padding:0;">
+                            <label for="time_end">End Time</label>
+                            <div class="bfh-timepicker timepicker" data-mode="12h" data-time="12:00 PM" data-name="time_end" id="time_end"></div>
+                        </div>
+
                         <div class="input-group-btn">
                         <div class="btn-group">
                           <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Repeat <span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                              <li><input type="radio" id="never" name="repeat" value="never"><label for="never">Never</label></li>
-                              <li><input type="radio" id="daily" name="repeat" value="daily"><label for="daily">Daily</label></li>
-                              <li><input type="radio" id="weekly" name="repeat" value="weekly"><label for="weekly">Every week</label></li>
-                              <li><input type="radio" id="eoweek" name="repeat" value="biweekly"><label for="eoweek">Every other week</label></li>
-                              <li><input type="radio" id="monthly" name="repeat" value="monthly"><label for="monthly">Every month</label></li>
+                              <li><input type="radio" id="never" name="repeat" value="never"/><label for="never">Never</label></li>
+                              <li><input type="radio" id="daily" name="repeat" value="daily"/><label for="daily">Daily</label></li>
+                              <li><input type="radio" id="weekly" name="repeat" value="weekly"/><label for="weekly">Every week</label></li>
+                              <li><input type="radio" id="eoweek" name="repeat" value="biweekly"/><label for="eoweek">Every other week</label></li>
+                              <li><input type="radio" id="monthly" name="repeat" value="monthly"/><label for="monthly">Every month</label></li>
                             </ul>
                         </div>
                         <button type="submit" class="btn btn-default">Submit</button>
@@ -105,12 +112,20 @@
                 </div>
             </form>
         </div>
-            <div class="alert alert-warning alert-dismissible collapse" role="alert" id="select_repeat">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">x</span>
-                </button>
-                <strong>You must specify how often this event will repeat</strong>
-            </div>
+
+        <div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_1">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">x</span>
+            </button>
+            <strong>You must specify how often this event will repeat</strong>
+        </div>
+        <div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_2">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">x</span>
+            </button>
+            <strong>Start Time must be earlier than End Time</strong>
+        </div>
+
     </div>
 </aside>
 {% endif %}
