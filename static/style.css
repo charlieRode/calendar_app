@@ -138,3 +138,7 @@ span.glyphicon.menu {
     display: block;
 }
 
+.table > tbody > tr {
+    height: 62px;
+}
+

@@ -2,16 +2,16 @@
 {% block body %}
 <div class="container" style="width: 970px !important;">
     <div class="row">
-        <h2 class="scroll_right" style="font-family: Arial; margin-top: 40px">{{ today | replace("*", ("&nbsp;"|safe)) }}</h2><h2 class="titles scroll_left" style="margin-top: 40px">{{ date.strftime('%A') }}</h2>
+        <h2 class="scroll_right" style="font-family: Arial; margin-top: 40px"><a style="text-decoration: none;" href="{{ date_route }}">{{ today | replace("*", ("&nbsp;"|safe)) }}</a></h2><h2 class="titles scroll_left" style="margin-top: 40px">{{ date.strftime('%A') }}</h2>
     </div>
     {% for event in events %}
     <div class="row">
-        <div class="panel panel-success" data-start-time="{{ event [0] }}" data-end-time="{{ event[1] }}">
+        <div class="panel panel-success" data-start-time="{{ event.start_time }}" data-end-time="{{ event.end_time }}">
             <div class="panel-heading">
-                <h3 class="panel-title">{{ event[0] }} - {{ event[1] }}</h3>
+                <h3 class="panel-title">{{ event.start_time }} - {{ event.end_time }}<span class="scroll_right" style="margin-right: 25px;"><em>{{ event.user }}</em></span></h3>
             </div>
             <div class="panel-body">
-                {{ event[2] }}
+                {{ event.description }}
             </div>
         </div>
     </div>

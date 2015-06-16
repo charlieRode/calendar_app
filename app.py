@@ -184,12 +184,20 @@ def read_day(request):
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [today])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2])) for tup in query_result]
 
+    class Event(object):
+        def __init__(self, start_time, end_time, description, user):
+            self.start_time = start_time
+            self.end_time = end_time
+            self.description = description
+            self.user = user
+
+    result = [Event(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), str(tup[6])) for tup in query_result]
+    date_route = '/date?date=' + str(date).split(' ')[0]
     # Our view function needs to return the packaged information we've requested in a format
     # that our jinja2 template can render.
 
-    return {'date': date, 'today': convert_to_readable_format(today), 'events': result}
+    return {'date': date, 'date_route': date_route, 'today': convert_to_readable_format(today), 'events': result}
 
 
 def delete_event(request):
