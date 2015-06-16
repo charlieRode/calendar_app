@@ -1,13 +1,47 @@
+
+#calendar-container {
+    padding: 10px;
+    width: 970px;
+    text-align: center;
+    font-size: 16px;
+    font-family: Arial;
+}
+
+#calendar-container>div {
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+#calendar-month-year {
+    margin: 5px;
+}
+
+#calendar-dates>table>tbody>tr>td{
+    padding: 5px;
+    border: 1px solid #EEE;
+    height: 135px;
+}
+
+#calendar-dates>table {
+    width: 100%;
+}
+
+
+span.glyphicon.menu {
+    font-size: 2em;
+}
+
+
 .titles {
     color: #337ab7;
-    font-family: verdana;
+    font-family: Arial;
     display: inline-block;
 }
 
 .month_title {
     text-align: center;
     font-size: 36px;
-    font-family: verdana;
+    font-family: Arial;
     font-weight: 500;
 }
 
@@ -44,7 +78,6 @@
 
 .day_block {
     border: 1px solid gray;
-    display: inline-block;
     margin-right: -1px;
     height: 140px;
     width: 139.486px;
@@ -55,10 +88,53 @@
 }
 
 .diff_month {
-    background-color: #F2F2F2;
+    background-color: #F4F4F4;
+
+}
+
+.same_month {
+
 }
 
 .pastEvent, .pastEvent.panel-title {
     color: #8E8E8E;
+}
+
+.username {
+    font-family: Arial;
+}
+
+.blips {
+    width: 10px;
+    height: 100px;
+    float: right;
+    transform: translateY(-15%);
+    z-index: 5;
+    margin-top: -24px;
+}
+
+.blips>span {
+    vertical-align: top;
+    position: relative;
+    right: -3px;
+}
+
+.nums {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.glyphicon.glyphicon-one-fine-dot {
+    margin-bottom: -.8em;
+    overflow: hidden;
+}
+
+.glyphicon.glyphicon-one-fine-dot:before {
+    content: "\25cf";
+    font-size: 1em;
+    color: #337ab7;
+    display: block;
 }
 

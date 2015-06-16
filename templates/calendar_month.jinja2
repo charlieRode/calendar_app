@@ -33,69 +33,69 @@
         --><div class="day_of_week">Fri</div><!--
         --><div class="day_of_week">Sat</div>
     </div>
-        <form action="{{ request.route_url('date') }}" method="GET">
-            <div class="row">
-            {% for date in dates[:7] -%}
-            {%- if date == 0 -%}
-            <label><div class="day_block diff_month"></div></label>
-            {%- else -%}
-            <label for="{{ date }}"><!--
-            -->{% if date.month != the_month %}<div class="day_block diff_month">
-                    <div class="daynum">{{ date.day }}</div>
-                </div>{% else %}<div class="day_block">
-                    <div class="daynum">{{ date.day }}</div>
-                </div>{% endif %}<!--
-        --></label><!--
-            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endif -%}{%- endfor %}</div>
+    <form action="/date" method="GET">
+        <div class="row">
+        {% for date in dates[:7] -%}
+        {%- if date == 0 -%}
+        <label><div class="day_block diff_month"></div></label>
+        {%- else -%}
+        <label for="{{ date }}"><!--
+        -->{% if date.month != the_month %}<div class="day_block diff_month">
+                <div class="daynum">{{ date.day }}</div>
+            </div>{% else %}<div class="day_block">
+                <div class="daynum">{{ date.day }}</div>
+            </div>{% endif %}<!--
+    --></label><!--
+        --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+        {%- endif -%}{%- endfor %}</div>
 
 
-            <div class="row row_calendar">{% for date in dates[7:14] -%}
-            <label for="{{ date }}"><!--
-            --><div class="day_block">
-                    <div class="daynum">{{ date.day }}</div>
-                </div><!--
-        --></label><!--
-            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endfor %}</div>
-            <div class="row row_calendar">{% for date in dates[14:21] -%}
-            <label for="{{ date }}"><!--
-            --><div class="day_block">
-                    <div class="daynum">{{ date.day }}</div>
-                </div><!--
-        --></label><!--
-            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endfor %}</div>
-            <div class="row row_calendar">{% for date in dates[21:28] -%}
-            <label for="{{ date }}"><!--
-            --><div class="day_block">
-                    <div class="daynum">{{ date.day }}</div>
-                </div><!--
-        --></label><!--
-            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endfor %}</div>
+        <div class="row row_calendar">{% for date in dates[7:14] -%}
+        <label for="{{ date }}"><!--
+        --><div class="day_block">
+                <div class="daynum">{{ date.day }}</div>
+            </div><!--
+    --></label><!--
+        --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+        {%- endfor %}</div>
+        <div class="row row_calendar">{% for date in dates[14:21] -%}
+        <label for="{{ date }}"><!--
+        --><div class="day_block">
+                <div class="daynum">{{ date.day }}</div>
+            </div><!--
+    --></label><!--
+        --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+        {%- endfor %}</div>
+        <div class="row row_calendar">{% for date in dates[21:28] -%}
+        <label for="{{ date }}"><!--
+        --><div class="day_block">
+                <div class="daynum">{{ date.day }}</div>
+            </div><!--
+    --></label><!--
+        --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+        {%- endfor %}</div>
 
-            <div class="row row_calendar">{% for date in dates[28:35] -%}
-            <label for="{{ date }}"><!--
-            -->{% if date.month != the_month %}<div class="day_block diff_month">
-                    <div class="daynum">{{ date.day }}</div>
-                </div>{% else %}<div class="day_block">
-                    <div class="daynum">{{ date.day }}</div>
-                </div>{% endif %}<!--
-        --></label><!--
-            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endfor %}</div>
-            
-            <div class="row row_calendar">{% for date in dates[35:42] -%}
-            <label for="{{ date }}"><!--
-            -->{% if date.month != the_month %}<div class="day_block diff_month">
-                    <div class="daynum">{{ date.day }}</div>
-                </div>{% else %}<div class="day_block">
-                    <div class="daynum">{{ date.day }}</div>
-                </div>{% endif %}<!--
-        --></label><!--
-            --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
-            {%- endfor %}</div>
-        </form>
+        <div class="row row_calendar">{% for date in dates[28:35] -%}
+        <label for="{{ date }}"><!--
+        -->{% if date.month != the_month %}<div class="day_block diff_month">
+                <div class="daynum">{{ date.day }}</div>
+            </div>{% else %}<div class="day_block">
+                <div class="daynum">{{ date.day }}</div>
+            </div>{% endif %}<!--
+    --></label><!--
+        --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+        {%- endfor %}</div>
+        
+        <div class="row row_calendar">{% for date in dates[35:42] -%}
+        <label for="{{ date }}"><!--
+        -->{% if date.month != the_month %}<div class="day_block diff_month">
+                <div class="daynum">{{ date.day }}</div>
+            </div>{% else %}<div class="day_block">
+                <div class="daynum">{{ date.day }}</div>
+            </div>{% endif %}<!--
+    --></label><!--
+        --><input type="radio" class="radio-button" style="display: none;" id="{{ date }}" name="date" value="{{ date }}"/>            
+        {%- endfor %}</div>
+    </form>
 </div>
 {% endblock %}

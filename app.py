@@ -13,6 +13,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
+from pyramid.security import authenticated_userid
+from pyramid.request import Request
 from waitress import serve
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
@@ -24,9 +26,10 @@ here = os.path.dirname(os.path.abspath(__file__))
 TABLE1_SCHEMA = """
 CREATE TABLE IF NOT EXISTS days (
     date DATE PRIMARY KEY,
-    dow SMALLINT NOT NULL)
+    dow SMALLINT NOT NULL,
+    num_events SMALLINT NOT NULL)
 """
-TABLE2_SCHEMA = """
+TABLE3_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
     id serial PRIMARY KEY,
     r_id INTEGER NOT NULL,
@@ -34,7 +37,16 @@ CREATE TABLE IF NOT EXISTS events (
     description TEXT NOT NULL,
     date DATE REFERENCES days(date) NOT NULL,
     time TIME NOT NULL,
-    time_end TIME NOT NULL)
+    time_end TIME NOT NULL,
+    username TEXT REFERENCES users(username) NOT NULL)
+"""
+
+TABLE2_SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    id serial PRIMARY KEY,
+    username text NOT NULL UNIQUE,
+    password text NOT NULL,
+    email text NOT NULL)
 """
 
 SEQUECE_SCHEMA = """
@@ -42,7 +54,7 @@ CREATE SEQUENCE rid NO MAXVALUE OWNED BY events.r_id
 """
 
 ADD_EVENT = """
-INSERT INTO events (repeats, r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s, %s)
+INSERT INTO events (username, repeats, r_id, description, date, time, time_end) VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
 
 REMOVE_EVENT = """
@@ -54,7 +66,7 @@ DELETE FROM events WHERE r_id=%s
 """
 
 RETRIEVE_DAY = """
-SELECT time, time_end, description, r_id, id, repeats from events WHERE date=%s ORDER BY time ASC
+SELECT time, time_end, description, r_id, id, repeats, username from events WHERE date=%s ORDER BY time ASC
 """
 
 logging.basicConfig()
@@ -77,11 +89,11 @@ def convert_to_readable_format(date):
         day += 'rd'
     else:
         day += 'th'
-    return '{m} {d}, {y}'.format(y=year, m=month, d=day)
+    return '{m} {d}* {y}'.format(y=year, m=month, d=day)
 
 
-@view_config(route_name='calendar_month', renderer='templates/calendar_month.jinja2')
-def read_calendar_month(request):
+@view_config(route_name='calendar', renderer='templates/calendar.jinja2')
+def read_calendar(request):
     the_month = int(request.params['month'])
     prev_month = 12 if the_month == 1 else the_month - 1
     next_month = 1 if the_month == 12 else the_month + 1
@@ -98,44 +110,69 @@ def read_calendar_month(request):
     # Grab the first Sunday on or before the 1st of the month:
     first_sunday = first_of_month - datetime.timedelta(dow)
     last_saturday = first_sunday + datetime.timedelta(41)
-    cur.execute("SELECT date FROM days WHERE date >= %s AND date <= %s", [first_sunday, last_saturday])
+    cur.execute("SELECT date, num_events FROM days WHERE date >= %s AND date <= %s ORDER BY date ASC", [first_sunday, last_saturday])
     query_result = cur.fetchall()
-    # Format results as list of date objects
-    dates = [result[0] for result in query_result]
+    
+    class Day(object):
+        def __init__(self, date, num_events):
+            self.date = date
+            self.num_events = min(num_events, 6)  # I can't figure out how to do this in the template. But I'm sure that's where it should be done.
+
+
+    dates = []
+    for result in query_result:
+        dates.append(Day(result[0], result[1]))
+
+
+
     if the_month == 1:
-        dow = dates[0].isoweekday() if dates[0].isoweekday() != 7 else 0
-        front = [0] * dow # Shouldn't matter what goes here. Just the length of the list is important.
+        dow = dates[0].date.isoweekday() if dates[0].date.isoweekday() != 7 else 0
+        front = [Day(0, 0)] * dow # Shouldn't matter what goes here. Just the length of the list is important.
         dates = front + dates
-    return {'dates': dates, 'month_name': month_name, 'the_month': the_month,
+    elif the_month == 12:
+        dow = 7 - (dates[-1].date.isoweekday() + 1)
+        tail = [Day(0, 0)] * dow
+        dates = dates + tail
+
+    return {'days': dates, 'month_name': month_name, 'the_month': the_month,
     'prev_month': prev_month, 'next_month': next_month}
+
 
 
 @view_config(route_name='date', renderer='templates/date.jinja2')
 def read_date(request):
-    date = request.params['date']
-    dow = datetime.datetime(int(date.split('-')[0]), int(date.split('-')[1]), int(date.split('-')[2])).strftime('%A')
+    date = request.params.get('date', None)
+    date_obj = datetime.date(int(date.split('-')[0]), int(date.split('-')[1]), int(date.split('-')[2]))
+    tomorrow = date_obj + datetime.timedelta(1)
+    if tomorrow.year != datetime.date.today().year:
+        tomorrow = datetime.date(datetime.date.today().year, tomorrow.month, tomorrow.day)
+    yesterday = date_obj + datetime.timedelta(-1)
+    if yesterday.year != datetime.date.today().year:
+        yesterday = datetime.date(datetime.date.today().year, yesterday.month, yesterday.day)
+    dow = date_obj.strftime('%A')
     readable_date = convert_to_readable_format(date)
     cur = request.db.cursor()
     cur.execute(RETRIEVE_DAY, [date])
     query_result = cur.fetchall()
-    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4], tup[5]) for tup in query_result]
+    result = [(tup[0].strftime('%I:%M %p').lstrip('0'), tup[1].strftime('%I:%M %p').lstrip('0'), str(tup[2]), tup[3], tup[4], tup[5], tup[6]) for tup in query_result]
 
     class Event(object):
-        def __init__(self, i_d, r_id, repeats, start_time, end_time, description):
+        def __init__(self, i_d, r_id, repeats, start_time, end_time, description, username):
             self.id = i_d
             self.r_id = r_id
             self.repeats = repeats
             self.time = start_time
             self.time_end = end_time
             self.description = description
+            self.username = username
 
     events = []
     # For each event in results, event[0] is start time, event[1] is end time, event[2] is description, event[3] is repeat_id, event[4] is id,
-    # event[5] is repeats
+    # event[5] is repeats, event[6] is username
     for event in result:
-        events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2]))
+        events.append(Event(event[4], event[3], event[5], event[0], event[1], event[2], event[6]))
 
-    return {'date': date, 'dow': dow, 'readable_date': readable_date, 'events': events}
+    return {'date': date, 'dow': dow, 'readable_date': readable_date, 'events': events, 'yesterday': yesterday, 'tomorrow': tomorrow}
 
 
 @view_config(route_name='home', renderer='templates/day.jinja2')
@@ -157,13 +194,21 @@ def read_day(request):
 
 def delete_event(request):
     """removes an event from the calendar"""
-    del_all = bool(request.params['del_all']) # Apparently I can only pass strings through HTML forms
+    del_all = bool(request.params.get('del_all', None)) # Apparently I can only pass strings through HTML forms
+    cur = request.db.cursor()
     if del_all:
-        event_id = request.params['r_id']
-        request.db.cursor().execute(REMOVE_EACH_EVENT, [event_id])
+        event_id = request.params.get('r_id', None)
+        cur.execute("SELECT date FROM events WHERE r_id=%s", [event_id])
+        query_result = cur.fetchall()
+        cur.execute(REMOVE_EACH_EVENT, [event_id])
     else:
-        event_id = request.params['id']
-        request.db.cursor().execute(REMOVE_EVENT, [event_id])
+        event_id = request.params.get('id', None)
+        cur.execute("SELECT date FROM events WHERE id=%s", [event_id])
+        query_result = cur.fetchall()
+        cur.execute(REMOVE_EVENT, [event_id])
+
+    dates = tuple([result[0] for result in query_result])
+    request.db.cursor().execute("UPDATE days SET num_events = num_events - 1 WHERE date in %s", [dates])
 
 
 @view_config(route_name='delete', request_method='POST')
@@ -189,27 +234,30 @@ def get_next_rid(request):
 
 def add_event(request):
     """adds an event to the calendar"""
+    user = request.authenticated_userid
     repeat_id = get_next_rid(request)
     final_date = datetime.date(datetime.date.today().year, 12, 31)
     repeat = request.params['repeat']
     event = request.params['description']
     date = request.params['date']
-    time = request.params['time']
-    time_end = request.params['time_end']
+    time = datetime.datetime.strptime(request.params['time'], '%I:%M %p').time()
+    time_end = datetime.datetime.strptime(request.params['time_end'], '%I:%M %p').time()
     date_nums = date.split('-')
     current = datetime.date(int(date_nums[0]), int(date_nums[1]), int(date_nums[2]))
-    if time_end < time:
+    if (time_end < time):
         raise ValueError('End time must be later than start time')
     repeats = 't'
     if repeat == 'never':
         repeats = 'f'
-        request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, date, time, time_end])
+        request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, date, time, time_end])
+        request.db.cursor().execute("UPDATE days SET num_events = num_events + 1 WHERE date=%s", [date])
     elif repeat == 'monthly':
         the_day = int(date_nums[2])
         current_month = int(date_nums[1])
         while current_month <= 12:
             date = datetime.date(int(date_nums[0]), current_month, the_day)
-            request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, date, time, time_end])
+            request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, date, time, time_end])
+            request.db.cursor().execute("UPDATE days SET num_events = num_events + 1 WHERE date=%s", [date])
             current_month += 1
     else:
         if repeat == 'daily':
@@ -220,7 +268,8 @@ def add_event(request):
             f = 14
         while current <= final_date:
             try:
-                request.db.cursor().execute(ADD_EVENT, [repeats, repeat_id, event, current, time, time_end])
+                request.db.cursor().execute(ADD_EVENT, [user, repeats, repeat_id, event, current, time, time_end])
+                request.db.cursor().execute("UPDATE days SET num_events = num_events + 1 WHERE date=%s", [current])
             except psycopg2.Error:
                 break;
             else:
@@ -246,6 +295,35 @@ def add_event_view(request):
 
 def connect_db(settings):
     return psycopg2.connect(settings['db'])
+
+
+@view_config(route_name='register', renderer='templates/register.jinja2')
+def register(request):
+    return {}
+
+
+@view_config(route_name='register_view', request_method='POST')
+def register_view(request):
+    try:
+        register_user(request)
+    except psycopg2.Error as e:
+        return HTTPInternalServerError
+    return HTTPFound(request.route_url('login'))
+
+
+def register_user(request):
+    username = request.params.get('username', '')
+    password = request.params.get('password', '')
+    password_again = request.params.get('password_again', '')
+    email = request.params['email']
+    hashed_pass = BCRYPTPasswordManager().encode(password)
+    if password != password_again:
+        raise ValueError("Passwords don't match")
+    try:
+        request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hashed_pass, email])
+    except psycopg2.Error as e:
+        raise ValueError("That username already exists!")
+    return
 
 
 @view_config(route_name='login', renderer='templates/login.jinja2')
@@ -276,11 +354,14 @@ def do_login(request):
     password = request.params.get('password', None)
     if not (username and password):
         raise ValueError('both username and password required')
-    settings = request.registry.settings
     manager = BCRYPTPasswordManager()
-    if username == settings.get('auth.username', ''):
-        hashed = settings.get('auth.password', '')
-        return manager.check(hashed, password)
+    cur = request.db.cursor()
+    cur.execute("SELECT password FROM users WHERE username=%s", [username])
+    try:
+        actual_password = cur.fetchall()[0][0]  # Extrrrract the data
+    except IndexError:  # Given username couldn't be found
+        return False
+    return manager.check(actual_password, password)
 
 
 def init_db():
@@ -291,12 +372,13 @@ def init_db():
     with closing(connect_db(settings)) as db:
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
+        db.cursor().execute(TABLE3_SCHEMA)
         db.cursor().execute(SEQUECE_SCHEMA)
         db.commit()
 
     def populate_calendar():
         INSERT_DAY = """
-        INSERT INTO days (date, dow) VALUES (%s, %s)
+        INSERT INTO days (date, dow, num_events) VALUES (%s, %s, %s)
         """
         # I am starting the database on Jan 1st of the current year.
         # I will need to update this for the next year if this project turns out.
@@ -304,7 +386,7 @@ def init_db():
         dow = (date.weekday() + 1) % 7  # <- Sunday: 0, Monday : 1, ..., Saturday: 6
         with closing(connect_db(settings)) as db:
             for i in xrange(365):
-                db.cursor().execute(INSERT_DAY, [date, dow])
+                db.cursor().execute(INSERT_DAY, [date, dow, 0])
                 date += datetime.timedelta(1)
                 dow = (date.weekday() + 1) % 7
             db.commit()
@@ -367,9 +449,11 @@ def main():
     config.add_route('add', '/add')
     config.add_route('delete', '/delete')
     config.add_route('date', '/date')
-    config.add_route('calendar_month', '/calendar_month')
+    config.add_route('calendar', '/calendar')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('register', '/register')
+    config.add_route('register_view', '/register_view')
     config.scan()
     app = config.make_wsgi_app()
     return app

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Calendar App</title>
-        <link type="text/css" rel="stylesheet" href="/static/style.css?v=17"/>
+        <link type="text/css" rel="stylesheet" href="/static/style.css?v=21"/>
         <!-- Bootstrap: -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
 
@@ -41,34 +41,35 @@
                         {% if not request.authenticated_userid %}
                         <li><a href="{{request.route_url('login')}}">Login</a></li>
                         {% else %}
+                        <li><a href='#'>Hello, {{ request.authenticated_userid }}</a></li>
                         <li><a href="{{request.route_url('logout')}}">Logout</a></li>
                         {% endif %}
                         <li class="dropdown">
                           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Calendar <span class="caret"></span></a>
                           <ul class="dropdown-menu" role="menu">
-                            <li><a href="/calendar_month?month=1">January</a></li>
+                            <li><a href="/calendar?month=1">January</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=2">February</a></li>
+                            <li><a href="/calendar?month=2">February</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=3">March</a></li>
+                            <li><a href="/calendar?month=3">March</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=4">April</a></li>
+                            <li><a href="/calendar?month=4">April</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=5">May</a></li>
+                            <li><a href="/calendar?month=5">May</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=6">June</a></li>
+                            <li><a href="/calendar?month=6">June</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=7">July</a></li>
+                            <li><a href="/calendar?month=7">July</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=8">August</a></li>
+                            <li><a href="/calendar?month=8">August</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=9">September</a></li>
+                            <li><a href="/calendar?month=9">September</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=10">October</a></li>
+                            <li><a href="/calendar?month=10">October</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=11">November</a></li>
+                            <li><a href="/calendar?month=11">November</a></li>
                             <li class="divider"></li>
-                            <li><a href="/calendar_month?month=12">December</a></li>
+                            <li><a href="/calendar?month=12">December</a></li>
                           </ul>
                         </li>
                       </ul>
@@ -80,6 +81,7 @@
         <main>
             <div class="container" style="width: 970px !important;">
                 <div class="col-xs-*">
+                    <p></p>
                     <section id="content">
                     {% block body %}{% endblock %}
                     </section>
@@ -98,8 +100,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/static/script.js?v=7"></script>
         <script src="/static/formhelpers/bootstrapformhelpers/js/bootstrap-formhelpers.js"></script>
+        <script src="/static/formhelpers/bootstrapformhelpers/js/bfh-timepicker.js"></script>
         <script type="text/javascript" src="/static/dropdowns-enhancement.js"></script>
+        <script type="text/javascript" src="/static/script.js?v=13"></script>
     </body>
 </html>

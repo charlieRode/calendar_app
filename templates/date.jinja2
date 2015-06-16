@@ -1,18 +1,38 @@
 {% extends "base.jinja2" %}
 {% block body %}
 <div class="container" style="width: 970px !important;">
-    <h2 class="titles scroll_left">{{ dow }}</h2> <h2 class="titles scroll_right">{{ readable_date }}</h2>
+    <div class="row vert_center">
+        <div class="col-md-1">
+            <div id="{{ yesterday }}" class="toggle_day scroll_left vert_center" style="height: 50px; padding-left: 5px;">
+                <span class="glyphicon glyphicon-menu-left menu" aria-hidden="true"></span>
+            </div>
+        </div>
+        <div class="col-md-10" style="margin-bottom: 5px; text-align: center;">
+            <h2 class="titles">{{ dow }}, &nbsp; {{ readable_date | replace("*", ("&nbsp;"|safe)) }}</h2>
+        </div>
+        <div class="col-md-1">
+            <div id="{{ tomorrow }}" class="toggle_day scroll_right vert_center" style="height: 50px; padding-right: 5px;">
+                <span class="glyphicon glyphicon-menu-right menu" aria-hidden="true"></span>
+            </div>
+        </div>
+    </div>
     <table class="table table-striped">
         {% for event in events %}
         <tr>
-            <td width="30%">{{ event.time }} - {{ event.time_end }}</td>
-            <td width="50%">{{ event.description }}</td>
-            <td width="10%">
+            <td width="25%">{{ event.time }} - {{ event.time_end }}</td>
+            <td width="43%">{{ event.description | e }}</td>
+            <td width="7%">
                 {% if event.repeats -%}
                 <span style="color: green" class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span>
                 {%- endif %}
             </td>
-            <td width="10%">
+            {%- if event.username == request.authenticated_userid -%}
+            <td width="20%"><span class="username" style="color: #337ab7"><em>{{ event.username }}</em></span></td>
+            {%- else -%}
+            <td width="20%"><span class="username"><em>{{ event.username }}</em></span></td>
+            {%- endif %}
+            {%- if event.username == request.authenticated_userid -%}
+            <td width="5%">
                 <form action="{{request.route_url('delete')}}" method="POST" id="del-{{event.id}}">
                     <div class="form-group">
                         <input type="hidden" name="date" value="{{ date }}"/>
@@ -30,6 +50,9 @@
                     </div>
                 </form>
             </td>
+            {%- else -%}
+            <td width="5%"></td>
+            {%- endif %}
         </tr>
             <div class="modal fade del-{{event.id}}">
               <div class="modal-dialog">
@@ -62,18 +85,25 @@
                 <div class="form-group">
                     <div class="input-group">
                         <!-- Button and dropdown menu -->
-                        <label for="time">Start Time - End Time</label>
-                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time" id="time"></div>
-                        <div class="bfh-timepicker" data-mode="12h" data-time="12:00" data-name="time_end" id="time_end"></div>
+                        <div class="col-md-3" style="padding:0;">
+                            <label for="time">Start Time</label>
+                            <div class="bfh-timepicker timepicker" data-mode="12h" data-time="12:00 PM" data-name="time" id="time"></div>
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-3" style="padding:0;">
+                            <label for="time_end">End Time</label>
+                            <div class="bfh-timepicker timepicker" data-mode="12h" data-time="12:00 PM" data-name="time_end" id="time_end"></div>
+                        </div>
+
                         <div class="input-group-btn">
                         <div class="btn-group">
                           <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Repeat <span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                              <li><input type="radio" id="never" name="repeat" value="never"><label for="never">Never</label></li>
-                              <li><input type="radio" id="daily" name="repeat" value="daily"><label for="daily">Daily</label></li>
-                              <li><input type="radio" id="weekly" name="repeat" value="weekly"><label for="weekly">Every week</label></li>
-                              <li><input type="radio" id="eoweek" name="repeat" value="biweekly"><label for="eoweek">Every other week</label></li>
-                              <li><input type="radio" id="monthly" name="repeat" value="monthly"><label for="monthly">Every month</label></li>
+                              <li><input type="radio" id="never" name="repeat" value="never"/><label for="never">Never</label></li>
+                              <li><input type="radio" id="daily" name="repeat" value="daily"/><label for="daily">Daily</label></li>
+                              <li><input type="radio" id="weekly" name="repeat" value="weekly"/><label for="weekly">Every week</label></li>
+                              <li><input type="radio" id="eoweek" name="repeat" value="biweekly"/><label for="eoweek">Every other week</label></li>
+                              <li><input type="radio" id="monthly" name="repeat" value="monthly"/><label for="monthly">Every month</label></li>
                             </ul>
                         </div>
                         <button type="submit" class="btn btn-default">Submit</button>
@@ -82,12 +112,20 @@
                 </div>
             </form>
         </div>
-            <div class="alert alert-warning alert-dismissible collapse" role="alert" id="select_repeat">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">x</span>
-                </button>
-                <strong>You must specify how often this event will repeat</strong>
-            </div>
+
+        <div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_1">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">x</span>
+            </button>
+            <strong>You must specify how often this event will repeat</strong>
+        </div>
+        <div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_2">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">x</span>
+            </button>
+            <strong>Start Time must not be later than End Time</strong>
+        </div>
+
     </div>
 </aside>
 {% endif %}
