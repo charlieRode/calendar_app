@@ -3,10 +3,10 @@
 <div class="container" style="width: 970px !important;">
     <h2 class="titles">Sign Up</h2>
     <div class="well">
-        <form action="{{ request.route_url('register_view') }}" method="POST" onsubmit="return checkform(this);">
+        <form action="{{ request.route_url('register_view') }}" method="POST" onsubmit="return checkForm(this);">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-control" aria-label="..." required pattern="[a-zA-Z0-9]+"/>
+                <input type="text" id="username" name="username" class="form-control" aria-label="..."/>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
