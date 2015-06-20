@@ -437,10 +437,6 @@ def main():
     settings['db'] = os.environ.get(
         'DATABASE_URL', 'dbname=calendar_db user=store'
     )
-    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
-    manager = BCRYPTPasswordManager()
-    settings['auth.password'] = os.environ.get(
-        'AUTH_PASSWORD', manager.encode('sneakysecret'))
     # secret value for session signing:
     secret = os.environ.get('CALENDAR_SESSION_SECRET', 'supersecret')
     session_factory = SignedCookieSessionFactory(secret)
