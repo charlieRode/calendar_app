@@ -325,8 +325,9 @@ def register_user(request):
     password_again = request.params.get('password_again', '')
     email = request.params['email']
     hashed_pass = BCRYPTPasswordManager().encode(password)
-    if password != password_again:
-        raise ValueError("Passwords don't match")
+    invalid_form = (password != password_again) or (password == '') or (username == '') or (email == '')
+    if invalid_form:
+        raise ValueError("invalid form")
     try:
         request.db.cursor().execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", [username, hashed_pass, email])
     except psycopg2.Error as e:
