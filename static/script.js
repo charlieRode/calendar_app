@@ -1,3 +1,11 @@
+var updatePage = function() {
+    
+    $('#current_time').replaceWith('<p class="col-md-4" id="current_time">'+getCurrentTime()+'</p>');
+    $('div.panel').each(applyPanelClass);
+
+
+}
+
 var getCurrentTime = function() {
     var date, hours, minutes, ampm
     date = new Date();
@@ -104,9 +112,12 @@ var checkForm = function() {
 
 $(document).ready(function() {
 
-    $('#current_time').prepend(getCurrentTime);
 
+    $('#current_time').append(getCurrentTime);
     $('div.panel').each(applyPanelClass);
+
+
+    var timer = setInterval(updatePage, 10000);
 
     $('#sub').submit(function() {
         if (!($('#never').is(':checked') || $('#daily').is(':checked') || $('#weekly').is(':checked') || $('#eoweek').is(':checked') || $('#monthly').is(':checked'))) {
