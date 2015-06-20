@@ -142,3 +142,10 @@ span.glyphicon.menu {
     height: 62px;
 }
 
+#current_time {
+    text-align: center;
+    position: relative;
+    font-family: Helvetica;
+    font-weight: 100;
+    font-size: 60px;
+}
