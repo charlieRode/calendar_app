@@ -4,7 +4,7 @@
     <h2 class="titles">Login</h2>
     <div class="well">
         {% if error -%}
-        <p class="error"><strong>Error</strong>: {{ error }} </p>
+        <p class="error"><strong>{{ error }}</strong></p>
         {%- endif %}
         <form action="{{ request.route_url('login') }}" method="POST">
             <div class="form-group">

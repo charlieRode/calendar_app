@@ -362,7 +362,7 @@ def do_login(request):
     username = request.params.get('username', None)
     password = request.params.get('password', None)
     if not (username and password):
-        raise ValueError('both username and password required')
+        raise ValueError('Both Username and Password Required')
     manager = BCRYPTPasswordManager()
     cur = request.db.cursor()
     cur.execute("SELECT password FROM users WHERE username=%s", [username])
