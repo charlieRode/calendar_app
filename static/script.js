@@ -1,16 +1,28 @@
+var getCurrentTime = function() {
+    var date, hours, minutes, ampm
+    date = new Date();
+    hours = String(date.getHours());
+    minutes = String(date.getMinutes());
+    if(hours > 12){
+        ampm = 'PM';
+        hours -= 12;
+    }
+    else{
+        ampm = 'AM';
+    }
+    if(minutes < 10){
+        minutes = '0' + minutes;
+    }
+    var time = hours + ':' + minutes + ' ' + ampm;
+    return time;
+    
+}
 var applyPanelClass = function() {
     var date, currentDate, startTime, endTime;
     date = new Date();
     currentDate = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
-    console.log("currentDate: ", currentDate)
     startTime = new Date( $(this).data("start-time") + " " + currentDate );
     endTime = new Date( $(this).data("end-time") + " " + currentDate );
-    console.log("$(this).data('start-time'): ", $(this).data("start-time"));
-    console.log("$(this).data('end-time'): ", $(this).data("end-time"));
-    console.log("startTime: ", startTime);
-    console.log("endTime: ", endTime);
-    console.log("date > endTime: ", (date > endTime));
-    console.log("date >= startTime: ", (date >= startTime));
     if (date > endTime) {
         $(this).addClass('pastEvent');
         $(this).find('h3').addClass('pastEvent');
@@ -21,8 +33,79 @@ var applyPanelClass = function() {
     }
 }
 
+var invalidUsernameAlert = function() {
+    var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_username"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Usernames may only contain alphanumeric characters and underscores.</strong></div>';
+    $('#username').after(content);
+    $('#alert_username').show();
+}
+
+var invalidPasswordAlert = function() {
+    var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_password"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Passwords may only contain alphanumeric characters and underscores and must be at least 6 characters in length.</strong></div>';
+    $('#password').after(content);
+    $('#alert_password').show();
+}
+
+var mismatchedPassAlert = function() {
+    var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_mismatch"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Passwords don\'t match.</strong></div>';
+    $('#password_again').after(content);
+    $('#alert_mismatch').show();
+}
+
+
+var checkForm = function() {
+
+    var desiredUsername, password, passwordAgain, email
+    desiredUsername = $('#username').val();
+    password = $('#password').val();
+    passwordAgain = $('#password_again').val();
+    email = $('#email').val();
+
+    var invalidChars, invalidUsername
+    invalidChars = '!@#$%^&*(){}[]\'"\\|:;><?/+=- ';
+    for(i=0; i < invalidChars.length; i++){
+        if ($.inArray(invalidChars[i], desiredUsername) == -1){
+            invalidUsername = true;
+        }
+    }
+
+    var invalidPassword, mismatchedPass;
+    if (password.length < 6){
+        invalidPassword = true;
+    }
+    else{
+        for(i=0; i < invalidChars.length; i++){
+        if ($.inArray(invalidChars[i], password) == -1){
+            invalidPassword = true;
+            }
+        }
+    }
+
+    if(password != passwordAgain){
+        mismatchedPass = true;
+    }
+
+    if(invalidUsername){
+        invalidUsernameAlert();
+    }
+    if(invalidPassword){
+        invalidPasswordAlert();
+    }
+    if(mismatchedPass){
+        mismatchedPassAlert();
+    }
+
+    if(invalidUsername || invalidPassword || mismatchedPass){
+        return false;
+    }
+    return
+
+}
+
 
 $(document).ready(function() {
+
+    $('#current_time').prepend(getCurrentTime);
+
     $('div.panel').each(applyPanelClass);
 
     $('#sub').submit(function() {
@@ -71,18 +154,18 @@ $(document).ready(function() {
     });
 
     $('.date_block').click(function(){
-        var date_id = $(this).attr('id');
+        var dateId = $(this).attr('id');
         var f = document.createElement("form");
         f.setAttribute('method', "get");
         f.setAttribute('action', "/date");
 
         var i = document.createElement("input");
         i.setAttribute('name', "date");
-        i.setAttribute('value', date_id);
+        i.setAttribute('value', dateId);
 
         f.appendChild(i);
         
-        if (date_id != 0) {
+        if (dateId != 0) {
             f.submit();
         }
         
@@ -90,27 +173,28 @@ $(document).ready(function() {
 
 
     $('.toggle_month').click(function(){
-        var the_month = $(this).attr('id');
+        var theMonth = $(this).attr('id');
         var f = document.createElement("form");
         f.setAttribute('method', "get");
         f.setAttribute('action', "/calendar");
         var i = document.createElement("input");
         i.setAttribute('name', "month");
-        i.setAttribute('value', the_month);
+        i.setAttribute('value', theMonth);
         f.appendChild(i);
         f.submit();
 
     });
 
     $('.toggle_day').click(function(){
-        var the_day = $(this).attr('id');
+        var theDay = $(this).attr('id');
         var f = document.createElement("form");
         f.setAttribute('method', "get");
         f.setAttribute('action', "/date");
         var i = document.createElement("input");
         i.setAttribute('name', "date");
-        i.setAttribute('value', the_day)
+        i.setAttribute('value', theDay)
         f.appendChild(i);
         f.submit();
     });
+
 });
