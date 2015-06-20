@@ -1,9 +1,11 @@
+var displayUpdate = function() {
+    var content = "Updates for version 2."
+}
+
 var updatePage = function() {
     
     $('#current_time').replaceWith('<p class="col-md-4" id="current_time">'+getCurrentTime()+'</p>');
     $('div.panel').each(applyPanelClass);
-
-
 }
 
 var getCurrentTime = function() {
@@ -111,12 +113,22 @@ var checkForm = function() {
 
 
 $(document).ready(function() {
+    var date, expires
+    date = new Date();
+    expires = new Date(2015, 7, 1);
+    if (date < expires){
 
-
+        if($.cookie('msg') == '1'){
+            $('#notification_modal').modal('hide');
+        }
+        else {
+            $('#notification_modal').modal('show');
+            $.cookie('msg', '1', { expires: 1, path: '/' });
+        }
+    }
+    
     $('#current_time').append(getCurrentTime);
     $('div.panel').each(applyPanelClass);
-
-
     var timer = setInterval(updatePage, 10000);
 
     $('#sub').submit(function() {
