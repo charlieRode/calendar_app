@@ -2,7 +2,9 @@
 {% block body %}
 <div class="container" style="width: 970px !important;">
     <div class="row">
-        <h2 class="scroll_right" style="font-family: Arial; margin-top: 40px"><a style="text-decoration: none;" href="{{ date_route }}">{{ today | replace("*", ("&nbsp;"|safe)) }}</a></h2><h2 class="titles scroll_left" style="margin-top: 40px">{{ date.strftime('%A') }}</h2>
+        <h2 class="titles scroll_left col-md-4" style="margin-top: 40px; margin-left: -14px;">{{ date.strftime('%A') }}</h2>
+        <p class="col-md-4" id="current_time"></p>
+        <h2 class="scroll_right cold-md-4" style="font-family: Arial; margin-top: 40px"><a style="text-decoration: none;" href="{{ date_route }}">{{ today | replace("*", ("&nbsp;"|safe)) }}</a></h2>
     </div>
     {% for event in events %}
     <div class="row">
@@ -22,6 +24,5 @@
         </div>
     </div>
     {% endfor %}
-</div>
 {% endblock %}
 
