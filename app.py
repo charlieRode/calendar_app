@@ -23,6 +23,12 @@ from cryptacular.bcrypt import BCRYPTPasswordManager
 # corresponding to the current code file." -- Cris
 here = os.path.dirname(os.path.abspath(__file__))
 
+CLEAR_DB = """
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS days;
+"""
+
 TABLE1_SCHEMA = """
 CREATE TABLE IF NOT EXISTS days (
     date DATE PRIMARY KEY,
@@ -379,6 +385,7 @@ def init_db():
         'DATABASE_URL', 'dbname=calendar_db user=store'
     )
     with closing(connect_db(settings)) as db:
+        db.cursor().execute(CLEAR_DB)
         db.cursor().execute(TABLE1_SCHEMA)
         db.cursor().execute(TABLE2_SCHEMA)
         db.cursor().execute(TABLE3_SCHEMA)
