@@ -70,22 +70,23 @@ var checkForm = function() {
     passwordAgain = $('#password_again').val();
     email = $('#email').val();
 
-    var invalidChars, invalidUsername
-    invalidChars = '!@#$%^&*(){}[]\'"\\|:;><?/+=- ';
+    var invalidChars =  '!@#$%^&*(){}[]\'"\\|:;><?/+=- ';
+    var invalidUsername = false;
     for(i=0; i < invalidChars.length; i++){
-        if ($.inArray(invalidChars[i], desiredUsername) == -1){
+        if ($.inArray(invalidChars[i], desiredUsername) != -1){
             invalidUsername = true;
         }
     }
 
-    var invalidPassword, mismatchedPass;
+    var invalidPassword = false;
+    var mismatchedPass = false;
     if (password.length < 6){
         invalidPassword = true;
     }
     else{
         for(i=0; i < invalidChars.length; i++){
-        if ($.inArray(invalidChars[i], password) == -1){
-            invalidPassword = true;
+            if ($.inArray(invalidChars[i], password) != -1){
+                invalidPassword = true;
             }
         }
     }
@@ -126,7 +127,7 @@ $(document).ready(function() {
             $.cookie('msg', '1', { expires: 1, path: '/' });
         }
     }
-    
+
     $('#current_time').append(getCurrentTime);
     $('div.panel').each(applyPanelClass);
     var timer = setInterval(updatePage, 10000);
