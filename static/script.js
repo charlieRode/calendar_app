@@ -23,6 +23,9 @@ var getCurrentTime = function() {
     if(minutes < 10){
         minutes = '0' + minutes;
     }
+    if (hours == '0'){
+        hours = '12';
+    }
     var time = hours + ':' + minutes + ' ' + ampm;
     return time;
     
