@@ -8,6 +8,13 @@ var updatePage = function() {
     $('div.panel').each(applyPanelClass);
 }
 
+var updateDate = function() {
+    var today = new Date();
+    if (today.getHours()==0){
+        window.location.reload();
+    }
+}
+
 var getCurrentTime = function() {
     var date, hours, minutes, ampm
     date = new Date();
@@ -133,7 +140,8 @@ $(document).ready(function() {
 
     $('#current_time').append(getCurrentTime);
     $('div.panel').each(applyPanelClass);
-    var timer = setInterval(updatePage, 10000);
+    var timer1 = setInterval(updatePage, 10000);
+    var timer2 = setInterval(updateDate, 60000*60);
 
     $('#sub').submit(function() {
         if (!($('#never').is(':checked') || $('#daily').is(':checked') || $('#weekly').is(':checked') || $('#eoweek').is(':checked') || $('#monthly').is(':checked'))) {
