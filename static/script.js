@@ -119,7 +119,7 @@ var checkForm = function() {
 $(document).ready(function() {
     var date, expires
     date = new Date();
-    expires = new Date(2015, 7, 1);
+    expires = new Date(2015, 6, 1);
     if (date < expires){
 
         if($.cookie('msg') == '1'){
