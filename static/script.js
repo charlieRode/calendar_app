@@ -54,21 +54,27 @@ var applyPanelClass = function() {
 }
 
 var invalidUsernameAlert = function() {
-    var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_username"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Usernames may only contain alphanumeric characters and underscores.</strong></div>';
-    $('#username').after(content);
-    $('#alert_username').show();
+    if ($('#alert_username').length==0){
+        var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_username"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Usernames may only contain alphanumeric characters and underscores.</strong></div>';
+        $('#username').after(content);
+        $('#alert_username').show();
+    }
 }
 
 var invalidPasswordAlert = function() {
-    var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_password"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Passwords may only contain alphanumeric characters and underscores and must be at least 6 characters in length.</strong></div>';
-    $('#password').after(content);
-    $('#alert_password').show();
+    if ($('#alert_password').length==0){
+        var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_password"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Passwords may only contain alphanumeric characters and underscores and must be at least 6 characters in length.</strong></div>';
+        $('#password').after(content);
+        $('#alert_password').show();
+    }
 }
 
 var mismatchedPassAlert = function() {
-    var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_mismatch"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Passwords don\'t match.</strong></div>';
-    $('#password_again').after(content);
-    $('#alert_mismatch').show();
+    if ($('#alert_mismatch').length==0){
+        var content =  '<br><div class="alert alert-warning alert-dismissible collapse" role="alert" id="alert_mismatch"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button><strong>Passwords don\'t match.</strong></div>';
+        $('#password_again').after(content);
+        $('#alert_mismatch').show();
+    }
 }
 
 
