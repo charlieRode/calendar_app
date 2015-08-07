@@ -29,11 +29,11 @@
                         {% for day in days[0 + (week * 7) : 7 + (week * 7)] %}
                         {% if day.date.month != the_month %}
                             <td id="{{ day.date }}" class="diff_month date_block"><div class="nums">{{ day.date.day }}</div>
-                                <div class="blips">{% for n in range(day.num_events) -%}<span class="glyphicon glyphicon-one-fine-dot"></span>{%- endfor %}</div>
+                                <div class="blips">{% for name in day.events -%}<span>{{name[:2] + '\n'}}</span>{%- endfor %}</div>
                             </td>
                         {% else %}
                             <td id="{{ day.date }}" class="date_block"><div class="nums">{{ day.date.day }}</div>
-                                <div class="blips">{% for n in range(day.num_events) -%}<span class="glyphicon glyphicon-one-fine-dot"></span>{%- endfor %}</div>
+                                <div class="blips">{% for name in day.events -%}<span>{{name[:2] + '\n'}}</span>{%- endfor %}</div>
                             </td>
                         {% endif %}
                         {% endfor %}

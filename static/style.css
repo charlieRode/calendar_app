@@ -116,7 +116,9 @@ span.glyphicon.menu {
 .blips>span {
     vertical-align: top;
     position: relative;
-    right: -3px;
+    right: 3px;
+    font-size: 11px;
+    color: #337ab7;
 }
 
 .nums {

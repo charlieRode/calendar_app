@@ -118,6 +118,7 @@ def read_calendar(request):
     last_saturday = first_sunday + datetime.timedelta(41)
     cur.execute("SELECT date, num_events FROM days WHERE date >= %s AND date <= %s ORDER BY date ASC", [first_sunday, last_saturday])
     query_result = cur.fetchall()
+
     
     class Day(object):
         def __init__(self, date, num_events):
@@ -129,6 +130,11 @@ def read_calendar(request):
     for result in query_result:
         dates.append(Day(result[0], result[1]))
 
+    for d in dates:
+        # grab all events.username for each date
+        cur.execute("SELECT username FROM events WHERE date = %s", [d.date])
+        events = cur.fetchmany(6)
+        d.events = [event[0].upper() for event in events]
 
 
     if the_month == 1:
