@@ -10,7 +10,8 @@ var updatePage = function() {
 
 var updateDate = function() {
     var today = new Date();
-    if (today.getHours()==0){
+    var hour = today.getHours();
+    if (hour == 0 || hour == 12){
         window.location.reload();
     }
 }
@@ -147,7 +148,7 @@ $(document).ready(function() {
     $('#current_time').append(getCurrentTime);
     $('div.panel').each(applyPanelClass);
     var timer1 = setInterval(updatePage, 10000);
-    var timer2 = setInterval(updateDate, 60000*60);
+    var timer2 = setInterval(updateDate, 30000*60);
 
     $('#sub').submit(function() {
         if (!($('#never').is(':checked') || $('#daily').is(':checked') || $('#weekly').is(':checked') || $('#eoweek').is(':checked') || $('#monthly').is(':checked'))) {
