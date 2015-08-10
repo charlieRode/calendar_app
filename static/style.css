@@ -157,3 +157,7 @@ span.glyphicon.menu {
     color: #d9534f;
     font-family: Arial;
 }
+
+.currentDay {
+    border: 2px solid #BEE4BE !important;
+}

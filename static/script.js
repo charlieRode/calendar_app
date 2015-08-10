@@ -3,7 +3,6 @@ var displayUpdate = function() {
 }
 
 var updatePage = function() {
-    
     $('#current_time').replaceWith('<p class="col-md-4" id="current_time">'+getCurrentTime()+'</p>');
     $('div.panel').each(applyPanelClass);
 }
@@ -76,6 +75,26 @@ var mismatchedPassAlert = function() {
         $('#password_again').after(content);
         $('#alert_mismatch').show();
     }
+}
+
+var indicateToday = function() {
+    var date, month, day, theDate, todayCell
+    date = new Date();
+    if (date.getMonth() < 10){
+        month = '0' + (date.getMonth()+1).toString();
+    }
+    else{
+        month = (date.getMonth()+1).toString();
+    }
+    if (date.getDate() < 10){
+        day = '0' + date.getDate().toString();
+    }
+    else{
+        day = date.getDate().toString();
+    }
+    theDate = '#2015-' +  month + '-' + date.getDate().toString();
+    todayCell = $(theDate);
+    todayCell.addClass('currentDay');
 }
 
 
@@ -238,5 +257,6 @@ $(document).ready(function() {
         f.appendChild(i);
         f.submit();
     });
+    var item = indicateToday();
 
 });
