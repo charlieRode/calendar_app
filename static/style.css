@@ -158,6 +158,6 @@ span.glyphicon.menu {
     font-family: Arial;
 }
 
-.currentDay {
+.date_block.currentDay {
     border: 2px solid #BEE4BE !important;
 }
