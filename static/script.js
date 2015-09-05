@@ -92,7 +92,7 @@ var indicateToday = function() {
     else{
         day = date.getDate().toString();
     }
-    theDate = '#2015-' +  month + '-' + date.getDate().toString();
+    theDate = '#2015-' +  month + '-' + day;
     todayCell = $(theDate);
     todayCell.addClass('currentDay');
 }
