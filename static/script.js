@@ -80,7 +80,7 @@ var mismatchedPassAlert = function() {
 var indicateToday = function() {
     var date, month, day, theDate, todayCell
     date = new Date();
-    if (date.getMonth() < 10){
+    if (date.getMonth() < 9){
         month = '0' + (date.getMonth()+1).toString();
     }
     else{
