@@ -341,7 +341,7 @@ def register_user(request):
     if invalid_form:
         raise ValueError("invalid form")
     try:
-        request.db.cursor().execute("INSERT INTO users (username, password) VALUES (%s, %s, %s)", [username, hashed_pass])
+        request.db.cursor().execute("INSERT INTO users (username, password) VALUES (%s, %s)", [username, hashed_pass])
     except psycopg2.Error as e:
         raise ValueError("That username already exists!")
     return
