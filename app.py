@@ -24,9 +24,9 @@ from cryptacular.bcrypt import BCRYPTPasswordManager
 here = os.path.dirname(os.path.abspath(__file__))
 
 CLEAR_DB = """
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS days;
+DROP TABLE IF EXISTS users;
 """
 
 TABLE1_SCHEMA = """
@@ -404,7 +404,7 @@ def init_db():
         """
         # I am starting the database on Jan 1st of the current year.
         # I will need to update this for the next year if this project turns out.
-        date = datetime.date(2015, 1, 1)
+        date = datetime.date(2016, 1, 1)
         dow = (date.weekday() + 1) % 7  # <- Sunday: 0, Monday : 1, ..., Saturday: 6
         with closing(connect_db(settings)) as db:
             for i in xrange(365):
